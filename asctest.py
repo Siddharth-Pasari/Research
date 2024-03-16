@@ -1,7 +1,6 @@
 import os
 import numpy as np
 import openpyxl
-from openpyxl.styles import PatternFill
 
 # Load the ASC file and skip rows until "RAW_DATA 3 2400400"
 with open('p2.ASC', 'r') as file:
@@ -26,12 +25,12 @@ for row_values in data:
 if row:
     table.append(row)
 
-# Specify the file name for the XLS file
-xls_file_name = 'p2_formatted.xlsx'
+# Specify the file name for the XLSX file
+xlsx_file_name = 'p2_formatted.xlsx'
 
-# Check if the XLS file already exists
-if os.path.exists(xls_file_name):
-    os.remove(xls_file_name)  # Delete the existing file
+# Check if the XLSX file already exists
+if os.path.exists(xlsx_file_name):
+    os.remove(xlsx_file_name)  # Delete the existing file
 
 # Create a new Excel workbook
 workbook = openpyxl.Workbook()
@@ -41,27 +40,28 @@ sheet = workbook.active
 data_min = np.min(data)
 data_max = np.max(data)
 
-# Define colors for the gradient fill FARTING  
-color_min = "FF0000"  # Red
-color_max = "0000FF"  # Blue
-
 # Define cell size (in points) for square cells
-cell_size = 10  # Adjust as needed
+base_cell_size = 10  # Adjust as needed
 
-# Write the formatted table to the Excel sheet with gradient fill colors and resized cells
+# Write the formatted table to the Excel sheet with grayscale gradient fill colors and resized cells
 for row_idx, row_data in enumerate(table, start=1):
     for col_idx, cell_data in enumerate(row_data, start=1):
         cell = sheet.cell(row=row_idx, column=col_idx, value=cell_data)
-        # Calculate the hue based on the cell's value
-        hue = int((cell_data - data_min) / (data_max - data_min) * 255)
-        # Define the fill color based on the hue
-        fill_color = f"{hue:02X}0000" if hue <= 128 else f"FF{255 - hue:02X}00"
-        cell.fill = PatternFill(start_color=fill_color, end_color=fill_color, fill_type="solid")
-        # Resize the cell to be a square
-        sheet.column_dimensions[openpyxl.utils.get_column_letter(col_idx)].width = cell_size
-        sheet.row_dimensions[row_idx].height = cell_size
+
+        # Calculate the grayscale value based on the cell's value
+        grayscale_value = ((cell_data - data_min) / (data_max - data_min))
+
+        # Convert grayscale value to RGB format
+        rgb_value = int(grayscale_value * 255)
+
+        # Set RGB values to create a grayscale gradient from black to white
+        fill_color = f"{rgb_value:02X}{rgb_value:02X}{rgb_value:02X}"
+        cell.fill = openpyxl.styles.PatternFill(start_color=fill_color, end_color=fill_color, fill_type="solid")
+
+        # Adjust column width to make the cell smaller
+        sheet.column_dimensions[openpyxl.utils.get_column_letter(col_idx)].width = base_cell_size / 60
 
 # Save the Excel workbook to a file
-workbook.save(xls_file_name)
+workbook.save(xlsx_file_name)
 
-print(f"Formatted table with gradient fill colors and resized cells written to '{xls_file_name}'")
+print(f"Formatted table with grayscale gradient fill colors and square cells written to '{xlsx_file_name}'")
