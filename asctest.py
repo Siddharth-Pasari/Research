@@ -42,7 +42,7 @@ sheet = workbook.active
 data_min = np.min(data)
 data_max = np.max(data)
 
-# Define colors for the gradient fill
+# Define colors for the gradient fill FARTING  
 color_min = "FF0000"  # Red
 color_max = "0000FF"  # Blue
 
