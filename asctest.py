@@ -3,14 +3,13 @@ import numpy as np
 import openpyxl
 from openpyxl.styles import PatternFill
 
-os.chdir(r'C:\Users\Siddharth Pasari\OneDrive\Documents\Research\profilometry')
 # Load the ASC file and skip rows until "RAW_DATA 3 2400400"
-with open(r'C:\Users\Siddharth Pasari\OneDrive\Documents\Research\profilometry\p2.ASC', 'r') as file:
+with open('p2.ASC', 'r') as file:
     lines = file.readlines()
     start_index = lines.index("RAW_DATA\t3\t2400400\t\n") + 1
 
 # Process the data and format into a table
-data = np.loadtxt(r'C:\Users\Siddharth Pasari\OneDrive\Documents\Research\profilometry\p2.ASC', skiprows=start_index)
+data = np.loadtxt('p2.ASC', skiprows=start_index)
 
 # Create a table with a new cell in the row for each space or row in the ASC file
 table = []
