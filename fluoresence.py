@@ -118,7 +118,7 @@ def print_coords1(event):
     # List of data points (area, mean, std_dev, min_val, max_val)
     data_measurements = [(num,area, mean, std_dev, min_val, max_val)]
 
-    update_excel_with_data(data_measurements, r'C:\Users\Siddharth Pasari\OneDrive\Documents\Research\Research\blankpythontester.xlsx')
+    update_excel_with_data(data_measurements, 'blankpythontester.xlsx')
 
 
 def print_coords(event):
