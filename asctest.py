@@ -56,12 +56,12 @@ for row_idx, row_data in enumerate(table, start=1):
         cell.fill = openpyxl.styles.PatternFill(start_color=fill_color, end_color=fill_color, fill_type="solid")
 
         # sets size of spreadsheet columns to match the appropriate proportions (x10 because minimum column width is around 0.1)
-        sheet.column_dimensions[openpyxl.utils.get_column_letter(col_idx)].width = 10 * (x_uM / y_uM) / (data_x/data_y)
+        sheet.column_dimensions[openpyxl.utils.get_column_letter(col_idx)].width = 56.315 * (x_uM / y_uM) / (data_x/data_y)
 
         # sets size of spreadsheet rows also because minimum column width but proportions need to be right
-        # kind of slows it down a bit but i cant think of a better way rn. if you go below like 0.l or smthn it dosent show the column at all
+        # kind of slows it down a bit but i cant think of a better way rn. if you go below like 0.l column width or smthn it rounds to zero
         for row_num in range(1, data_y + 1):
-            sheet.row_dimensions[row_num].height = 10
+            sheet.row_dimensions[row_num].height = 300
 
 # save the XLSX file!!
 workbook.save(xlsx_file_name)
