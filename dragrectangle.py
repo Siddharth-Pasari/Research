@@ -2,13 +2,48 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 import numpy as np
 import math
+import pandas as pd
+num=0
+
+
+def update_excel_with_data(data_measurements, file_path):
+    """
+    Inserts a list of data measurements into an Excel sheet.
+
+    Parameters:
+    - data_measurements: A list of tuples containing (area, mean, std_dev, min_val, max_val)
+    - file_path: Path to the Excel file where the data is to be inserted
+    """
+
+    # Convert the list of tuples to a pandas DataFrame
+    df = pd.DataFrame(data_measurements, columns=['Num','Top','Bottom'])
+    
+    # Open the Excel file and append the DataFrame
+    with pd.ExcelWriter(file_path, mode='a', engine='openpyxl', if_sheet_exists='overlay') as writer:
+        # Get the last row with data in the existing sheet
+        # If the file or sheet does not exist yet, it will start from the beginning
+        try:
+            startrow = writer.sheets['Sheet1'].max_row
+        except KeyError:
+            startrow = 0
+        
+        # If starting on a new sheet, write headers, otherwise skip them
+        if startrow == 0:
+            headers = True
+        else:
+            headers = False
+        
+        # Write the DataFrame to the Excel file
+        df.to_excel(writer, sheet_name='Sheet1', startrow=startrow, index=False, header=headers)
+
 
 class DragRectangle:
-    def __init__(self, ax, x_values, y_values, data):
+    def __init__(self, ax, x_values, y_values, data, path):
         self.ax = ax
         self.x_values = x_values
         self.y_values = y_values
         self.data = data
+        self.path = path
         self.rect = Rectangle((0, 0), 0, 0, linewidth=1, edgecolor='r', facecolor='none')
         self.is_dragging = False
         self.press_event = None
@@ -71,6 +106,7 @@ class DragRectangle:
         print("Max, Min:", self.findImportantValues())
 
     def findImportantValues(self):
+        global num
 
         if not self.selected_indices:
             return np.nan, np.nan  # Return NaN values if selected_indices is empty
@@ -99,5 +135,13 @@ class DragRectangle:
             bottom_value = slicearr[bottom_index]
         else:
             bottom_value = np.nan
+        
+        num=num+1
+
+        data_measurements = [(num, max_value, bottom_value)]
+
+        print(data_measurements)
+
+        update_excel_with_data(data_measurements, self.path)
 
         return max_value, bottom_value

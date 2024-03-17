@@ -85,6 +85,11 @@ def get_file_path():
     if file_path:  # Check if a file was selected
         display_image(file_path)
 
+def get_file_path2():
+    global excel_path
+    excel_path = filedialog.askopenfilename(initialdir="/", title="Select file",
+                                           filetypes=(("jpeg files", "*.jpg"), ("all files", "*.*")))
+
 def display_image(file_path):
     global img, tk_img, canvas  # Declare as global to access outside of the function
     img = Image.open(file_path)
@@ -117,7 +122,7 @@ def print_coords1(event):
     # List of data points (area, mean, std_dev, min_val, max_val)
     data_measurements = [(num,area, mean, std_dev, min_val, max_val)]
 
-    update_excel_with_data(data_measurements, 'blankpythontester.xlsx')
+    update_excel_with_data(data_measurements, excel_path)
 
 
 def print_coords(event):
@@ -138,6 +143,9 @@ root = tk.Tk()
 root.title('Image Viewer')
 
 btn_load = tk.Button(root, text="Load Image", command=get_file_path)
+btn_load.pack()
+
+btn_load = tk.Button(root, text="Load excel", command=get_file_path2)
 btn_load.pack()
 
 canvas = tk.Canvas(root, width=1920, height=1080)  # You might want to adjust the size to fit your image properly

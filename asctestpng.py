@@ -14,39 +14,9 @@ data_x = 6001 # found on ASC file
 data_y = 100 # found on ASC file
 #y_uM = 3051 # found on profilmonline
 #y_res = y_uM / data_y
-num=0
 
 print("-----------------------------------------------------------------------")
 
-def update_excel_with_data(data_measurements, file_path):
-    """
-    Inserts a list of data measurements into an Excel sheet.
-
-    Parameters:
-    - data_measurements: A list of tuples containing (area, mean, std_dev, min_val, max_val)
-    - file_path: Path to the Excel file where the data is to be inserted
-    """
-
-    # Convert the list of tuples to a pandas DataFrame
-    df = pd.DataFrame(data_measurements, columns=['Num','Top','Bottom'])
-    
-    # Open the Excel file and append the DataFrame
-    with pd.ExcelWriter(file_path, mode='a', engine='openpyxl', if_sheet_exists='overlay') as writer:
-        # Get the last row with data in the existing sheet
-        # If the file or sheet does not exist yet, it will start from the beginning
-        try:
-            startrow = writer.sheets['Sheet1'].max_row
-        except KeyError:
-            startrow = 0
-        
-        # If starting on a new sheet, write headers, otherwise skip them
-        if startrow == 0:
-            headers = True
-        else:
-            headers = False
-        
-        # Write the DataFrame to the Excel file
-        df.to_excel(writer, sheet_name='Sheet1', startrow=startrow, index=False, header=headers)
 
 # to convert from weird ASC values to microns
 def convertToMicrons(value):
@@ -71,8 +41,6 @@ def open_file():
         print("Close current plot before opening a new one!")
 
 def process_file(file_path):
-
-    global num
 
     '''# Check if any plots are already open
     if plt.get_fignums():
@@ -145,15 +113,8 @@ def process_file(file_path):
     x_values = np.linspace(0, data_x, data_x + 1)
     y_values = np.linspace(0, data_y, data_y + 1)
 
-    dr = dragrectangle.DragRectangle(ax, x_values, y_values, data)
+    dr = dragrectangle.DragRectangle(ax, x_values, y_values, data, path)
     dr.connect()
-    top, bottom = dr.findImportantValues()
-    
-    num=num+1
-
-    data_measurements = [(num, top, bottom)]
-
-    update_excel_with_data(data_measurements, path)
 
     # open plot
     plt.show()
