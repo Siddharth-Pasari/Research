@@ -52,6 +52,11 @@ class DragRectangle:
         x0, y0 = self.press_event.xdata, self.press_event.ydata
         x1, y1 = event.xdata, event.ydata
 
+        if x0 > x1:
+            x0, x1 = x1, x0
+        if y0 > y1:
+            y0, y1 = y1, y0
+
         x_indices = [int(i) for i in range(math.ceil(x0), math.floor(x1))]
         y_indices = [int(i) for i in range(math.ceil(y0), math.floor(y1))]
 
@@ -81,9 +86,12 @@ class DragRectangle:
         # Convert list to numpy array for easier manipulation and finds bottom based on a slope threshold
         slicearr = np.array(max_list)
         differences = np.diff(slicearr)
-        threshold = 5  # Adjust the threshold as needed
-        bottom_index = np.argmax(differences > threshold)
+        threshold = 0.03  # Adjust the threshold as needed
 
-        bottom_value = slicearr[bottom_index]
+        if np.any(differences > threshold):
+            bottom_index = np.argmax(differences > threshold)
+            bottom_value = slicearr[bottom_index]
+        else:
+            bottom_value = np.nan
 
         return max_value, bottom_value
