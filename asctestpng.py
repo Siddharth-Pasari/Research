@@ -8,11 +8,12 @@ import dragrectangle
 import pandas as pd
 
 # Set the size of the image to build the sheet more accurately and convert these weird numbers to actual height data
-height_uM = 9.899 # found on profilmonline
+#height_uM = 9.899 # found on profilmonline
 data_x = 6001 # found on ASC file
-x_uM = 3960 # found on profilmonline
+#x_uM = 3960 # found on profilmonline
 data_y = 100 # found on ASC file
 y_uM = 3051 # found on profilmonline
+y_res = y_uM / data_y
 num=0
 
 print("-----------------------------------------------------------------------")
@@ -53,6 +54,14 @@ def convertToMicrons(value):
     microns = microns * (height_uM / (highest_asc - lowest_asc))
     return microns
 
+def submit_values():
+    global path, x_uM, y_uM, height_uM, y_res
+    path = file_path_entry.get()
+    x_uM = int(x_um_entry.get())
+    y_uM = int(y_um_entry.get())
+    height_uM = int(height_um_entry.get())
+    y_res = y_uM / data_y
+    
 def open_file():
     if not plt.fignum_exists(1):
         file_path = filedialog.askopenfilename(filetypes=[("ASC files", "*.ASC")])
@@ -142,6 +151,10 @@ def process_file(file_path):
     
     num=num+1
 
+    top="ANTHONY FILL"
+
+    bottom="ANTHONY FILL"
+
     path="ANTHONY FILL"
 
     data_measurements=(num, top, bottom)
@@ -153,12 +166,41 @@ def process_file(file_path):
 
     print(f"Plotted numpy array as image with colormap and scale")
 
-# Create the GUI
 root = tk.Tk()
 root.title("ASC File Processor")
 
 btn_open = tk.Button(root, text="Open ASC File", command=open_file)
 btn_open.pack()
+
+file_path_label = tk.Label(root, text="File Path:")
+file_path_label.pack()
+
+file_path_entry = tk.Entry(root)
+file_path_entry.pack()
+
+x_um_label = tk.Label(root, text="X uM:")
+x_um_label.pack()
+
+x_um_entry = tk.Entry(root)
+x_um_entry.pack()
+
+y_um_label = tk.Label(root, text="Y uM:")
+y_um_label.pack()
+
+y_um_entry = tk.Entry(root)
+y_um_entry.pack()
+
+height_um_label = tk.Label(root, text="Height uM:")
+height_um_label.pack()
+
+height_um_entry = tk.Entry(root)
+height_um_entry.pack()
+
+submit_button = tk.Button(root, text="Submit", command=submit_values)
+submit_button.pack()
+
+# Start the Tkinter event loop
+root.mainloop()
 
 root.mainloop()
 print("Closing application...")
