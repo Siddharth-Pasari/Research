@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-import mplcursors
+#import mplcursors
 from matplotlib import ticker
 
 # Set the size of the image to build the sheet more accurately and convert these weird numbers to actual height data
