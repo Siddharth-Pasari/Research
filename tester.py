@@ -8,8 +8,9 @@ slicearr = np.array(slicelist)
 # Calculate differences between consecutive values
 differences = np.diff(slicearr)
 
-# Find the index where the difference starts to increase rapidly
-bottom_index = np.argmax(differences)  # Index of the maximum difference
+# Find the index where the difference exceeds the threshold
+threshold = 10  # Adjust the threshold as needed
+bottom_index = np.argmax(differences > threshold)
 
 # Get the value at the "bottom" index
 bottom_value = slicearr[bottom_index]
