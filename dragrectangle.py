@@ -65,6 +65,10 @@ class DragRectangle:
 
         print("Selected indices:", self.selected_indices)
 
+        slicelist=[]
+        
+        print(self.findImportantValues())
+        print(self.selected_indices)
 
     def findImportantValues(self):
 
