@@ -24,26 +24,30 @@ def convertToMicrons(value):
     return microns
 
 def open_file():
+    plt.show(block=False)
+    plt.clf()
+    plt.close('all')
+
     file_path = filedialog.askopenfilename(filetypes=[("ASC files", "*.ASC")])
     if file_path:
         process_file(file_path)
 
 def process_file(file_path):
-    
-    # Check if any plots are already open
+
+    '''# Check if any plots are already open
     if plt.get_fignums():
         print("Clearing existing plot...")
-        plt.clf()
+        plt.close()
     else:
-        print("No plot to clear.")
+        print("No plot to clear.")'''
 
     # Load the ASC file and skips the rows before the actual data
-    with open('p2.ASC', 'r') as file:
+    with open(file_path, 'r') as file:
         lines = file.readlines()
         start_index = lines.index("RAW_DATA\t3\t2400400\t\n") + 1
 
     # Process the data and format into a table
-    data = np.loadtxt('p2.ASC', skiprows=start_index)
+    data = np.loadtxt(file_path, skiprows=start_index)
 
     global highest_asc, lowest_asc
     highest_asc = np.max(data)
@@ -106,6 +110,7 @@ def process_file(file_path):
 
     # open plot
     plt.show()
+
     print(f"Plotted numpy array as image with colormap and scale")
 
 # Create the GUI
@@ -116,3 +121,4 @@ btn_open = tk.Button(root, text="Open ASC File", command=open_file)
 btn_open.pack()
 
 root.mainloop()
+print("Closing application...")
