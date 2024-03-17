@@ -14,6 +14,7 @@ data_x = 6001 # found on ASC file
 data_y = 100 # found on ASC file
 #y_uM = 3051 # found on profilmonline
 #y_res = y_uM / data_y
+
 num=0
 
 print("-----------------------------------------------------------------------")
@@ -84,7 +85,7 @@ def process_file(file_path):
     # Load the ASC file and skips the rows before the actual data
     with open(file_path, 'r') as file:
         lines = file.readlines()
-        start_index = lines.index("RAW_DATA\t3\t2400400\t\n") + 1
+        start_index = 9
 
     # Process the data and format into a table
     data = np.loadtxt(file_path, skiprows=start_index)
@@ -172,19 +173,19 @@ file_path_label.pack()
 file_path_entry = tk.Entry(root)
 file_path_entry.pack()
 
-x_um_label = tk.Label(root, text="X uM:")
+x_um_label = tk.Label(root, text="X uM (ProfilmOnline):")
 x_um_label.pack()
 
 x_um_entry = tk.Entry(root)
 x_um_entry.pack()
 
-y_um_label = tk.Label(root, text="Y uM:")
+y_um_label = tk.Label(root, text="Y uM (ProfilmOnline):")
 y_um_label.pack()
 
 y_um_entry = tk.Entry(root)
 y_um_entry.pack()
 
-height_um_label = tk.Label(root, text="Height uM:")
+height_um_label = tk.Label(root, text="Height uM (ProfilmOnline):")
 height_um_label.pack()
 
 height_um_entry = tk.Entry(root)
@@ -192,6 +193,9 @@ height_um_entry.pack()
 
 submit_button = tk.Button(root, text="Submit", command=submit_values)
 submit_button.pack()
+
+info = tk.Label(root, text = "Fill in text boxes, then click submit. After that, choose an ASC file. \n Before loading a new file, manually X out of the current one.")
+info.pack()
 
 # Start the Tkinter event loop
 root.mainloop()
