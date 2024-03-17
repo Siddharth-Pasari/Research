@@ -58,7 +58,8 @@ class DragRectangle:
         for j in y_indices:
             row_values = [self.data[j, i] for i in x_indices]
             self.selected_indices.append(row_values)
-
+        slicelist=[]
+        
         print(self.findImportantValues())
         print(self.selected_indices)
 
