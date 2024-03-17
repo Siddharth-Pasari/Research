@@ -6,13 +6,13 @@ from matplotlib.colors import LinearSegmentedColormap
 import cv2
 import dragrectangle
 import pandas as pd
+
 # Set the size of the image to build the sheet more accurately and convert these weird numbers to actual height data
 height_uM = 9.899 # found on profilmonline
 data_x = 6001 # found on ASC file
 x_uM = 3960 # found on profilmonline
 data_y = 100 # found on ASC file
 y_uM = 3051 # found on profilmonline
-y_res = y_uM / data_y
 num=0
 
 print("-----------------------------------------------------------------------")
@@ -54,7 +54,7 @@ def convertToMicrons(value):
     return microns
 
 def open_file():
-    if not plt.fignum_exists:
+    if not plt.fignum_exists(1):
         file_path = filedialog.askopenfilename(filetypes=[("ASC files", "*.ASC")])
         if file_path:
             process_file(file_path)
@@ -138,12 +138,9 @@ def process_file(file_path):
 
     dr = dragrectangle.DragRectangle(ax, x_values, y_values, data)
     dr.connect()
+    top, bottom = dr.findImportantValues()
     
     num=num+1
-
-    top="ANTHONY FILL"
-
-    bottom="ANTHONY FILL"
 
     path="ANTHONY FILL"
 
