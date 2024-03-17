@@ -50,8 +50,12 @@ class DragRectangle:
         # Get indices of selected area
         x0, y0 = self.press_event.xdata, self.press_event.ydata
         x1, y1 = event.xdata, event.ydata
+        print("Y0:", y0, "Y1:", y1)  # Debug print statement
         x_indices = np.where((self.x_values >= min(x0, x1)) & (self.x_values <= max(x0, x1)))[0]
         y_indices = np.where((self.y_values >= min(y0, y1)) & (self.y_values <= max(y0, y1)))[0]
+
+        print("X indices:", x_indices)
+        print("Y indices:", y_indices)
 
         # Get values within selected area
         self.selected_indices = []
@@ -59,8 +63,8 @@ class DragRectangle:
             row_values = [self.data[j, i] for i in x_indices]
             self.selected_indices.append(row_values)
 
-        print(self.findImportantValues())
-        print(self.selected_indices)
+        print("Selected indices:", self.selected_indices)
+
 
     def findImportantValues(self):
 

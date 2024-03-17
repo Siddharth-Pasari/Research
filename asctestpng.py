@@ -70,3 +70,4 @@ dr.connect()
 plt.show()
 
 print(f"Plotted numpy array as image with colormap and scale")
+print(np.max(data))
