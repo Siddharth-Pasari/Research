@@ -12,7 +12,7 @@ data_x = 6001 # found on ASC file
 #x_uM = 3960 # found on profilmonline
 data_y = 100 # found on ASC file
 #y_uM = 3051 # found on profilmonline
-y_res = y_uM / data_y
+
 num=0
 
 print("-----------------------------------------------------------------------")
@@ -54,11 +54,12 @@ def convertToMicrons(value):
     return microns
 
 def submit_values():
-    global path, x_uM, y_uM, height_uM
+    global path, x_uM, y_uM, height_uM, y_res
     path = file_path_entry.get()
-    x_uM = x_um_entry.get()
-    y_uM = y_um_entry.get()
-    height_uM = height_um_entry.get()
+    x_uM = int(x_um_entry.get())
+    y_uM = int(y_um_entry.get())
+    height_uM = int(height_um_entry.get())
+    y_res = y_uM / data_y
     
 def open_file():
     if not plt.fignum_exists:
@@ -148,9 +149,9 @@ def process_file(file_path):
     
     num=num+1
 
-    top="ANTHONY FILL"
+    top=dr.max_value
 
-    bottom="ANTHONY FILL"
+    bottom=dr.bottom_value
 
     data_measurements=(num, top, bottom)
 
