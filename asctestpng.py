@@ -13,7 +13,7 @@ data_x = 6001 # found on ASC file
 #x_uM = 3960 # found on profilmonline
 data_y = 100 # found on ASC file
 #y_uM = 3051 # found on profilmonline
-y_res = y_uM / data_y
+#y_res = y_uM / data_y
 num=0
 
 print("-----------------------------------------------------------------------")
@@ -151,7 +151,7 @@ def process_file(file_path):
     
     num=num+1
 
-    data_measurements=(num, top, bottom)
+    data_measurements = [(num, top, bottom)]
 
     update_excel_with_data(data_measurements, path)
 
