@@ -86,7 +86,7 @@ class DragRectangle:
         # Convert list to numpy array for easier manipulation and finds bottom based on a slope threshold
         slicearr = np.array(max_list)
         differences = np.diff(slicearr)
-        threshold = 0.03  # Adjust the threshold as needed
+        threshold = 0.01  # Adjust the threshold as needed
 
         if np.any(differences > threshold):
             bottom_index = np.argmax(differences > threshold)
