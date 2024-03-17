@@ -72,6 +72,9 @@ class DragRectangle:
 
     def findImportantValues(self):
 
+        if not self.selected_indices:
+            return np.nan, np.nan  # Return NaN values if selected_indices is empty
+
         # finds the row containing the peak
         max_value = float('-inf')
         max_list = None
@@ -81,6 +84,9 @@ class DragRectangle:
                 max_value = sublist_max
                 max_list = sublist
         
+        if max_list is None:
+            return np.nan, np.nan  # Return NaN values if max_list is None
+
         max_index = np.argmax(max_list)
         
         # Convert list to numpy array for easier manipulation and finds bottom based on a slope threshold
