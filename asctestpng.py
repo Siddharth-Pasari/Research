@@ -1,10 +1,10 @@
-import os
 import numpy as np
 import matplotlib.pyplot as plt
 #import mplcursors
 from matplotlib import ticker
-import math
 import dragrectangle
+from matplotlib.colors import LinearSegmentedColormap
+import cv2
 
 # Set the size of the image to build the sheet more accurately and convert these weird numbers to actual height data
 height_uM = 9.899 # found on profilmonline
@@ -25,11 +25,22 @@ with open('p2.ASC', 'r') as file:
 # Process the data and format into a table
 data = np.loadtxt('p2.ASC', skiprows=start_index)
 
+highest_asc = np.max(data)
+lowest_asc = np.min(data)
+
+# to convert from weird ASC values to microns
+def convertToMicrons(value):
+    microns = value - lowest_asc # adjusts for negative numbers
+    microns = microns * (height_uM / (highest_asc - lowest_asc))
+    return microns
+
+data = np.vectorize(convertToMicrons)(data)
+
 table = []
 row = []
 for row_values in data:
     for value in row_values:
-        if len(row) <= data_x: # According to the ASC file, the width is 6001
+        if len(row) < data_x:
             row.append(value)
         else:
             table.append(row)
@@ -38,8 +49,17 @@ for row_values in data:
 if row:
     table.append(row) # for the last row
 
-# Plotting the data with a hot colormap
-plt.imshow(data.T, cmap='hot', aspect=(data_y/data_x) * (y_uM/x_uM)) # rotate
+# yes i only wrote this to look like the profilmonline colormap since i think it looks cool
+image = cv2.imread('Colormap.png')
+image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+colors = []
+for row in reversed(image_rgb):
+    for color in row:
+        colors.append(color / 255.0)  # Normalize the colors to range [0, 1]
+custom_cmap = LinearSegmentedColormap.from_list('custom_colormap', colors)
+
+# Plotting the data with a jet colormap
+plt.imshow(data.T, cmap=custom_cmap, aspect=(data_y/data_x) * (y_uM/x_uM)) # rotate
 plt.colorbar()  # Add a color bar for reference
 
 # create custom tick values
@@ -69,6 +89,5 @@ y_values = np.linspace(0, data_y, data_y + 1)
 dr = dragrectangle.DragRectangle(ax, x_values, y_values, data)
 dr.connect()
 
-plt.show()
-
 print(f"Plotted numpy array as image with colormap and scale")
+plt.show()

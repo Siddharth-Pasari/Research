@@ -77,6 +77,13 @@ class DragRectangle:
                 max_list = sublist
         
         max_index = np.argmax(max_list)
-        bottom_value = "NAN" #(max_list[max_index - 1] + max_list[max_index - 2]) / 2
+        
+        # Convert list to numpy array for easier manipulation and finds bottom based on a slope threshold
+        slicearr = np.array(max_list)
+        differences = np.diff(slicearr)
+        threshold = 5  # Adjust the threshold as needed
+        bottom_index = np.argmax(differences > threshold)
+
+        bottom_value = slicearr[bottom_index]
 
         return max_value, bottom_value
