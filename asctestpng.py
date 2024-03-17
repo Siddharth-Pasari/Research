@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-import mplcursors
+#import mplcursors
 from matplotlib import ticker
 import math
 import dragrectangle
