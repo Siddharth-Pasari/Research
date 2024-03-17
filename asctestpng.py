@@ -10,7 +10,6 @@ import dragrectangle
 height_uM = 9.899 # found on profilmonline
 data_x = 6001 # found on ASC file
 x_uM = 3960 # found on profilmonline
-x_res = x_uM / data_x
 data_y = 100 # found on ASC file
 y_uM = 3051 # found on profilmonline
 y_res = y_uM / data_y
@@ -24,13 +23,12 @@ def convertToMicrons(value):
     return microns
 
 def open_file():
-    plt.show(block=False)
-    plt.clf()
-    plt.close('all')
-
-    file_path = filedialog.askopenfilename(filetypes=[("ASC files", "*.ASC")])
-    if file_path:
-        process_file(file_path)
+    if not plt.fignum_exists:
+        file_path = filedialog.askopenfilename(filetypes=[("ASC files", "*.ASC")])
+        if file_path:
+            process_file(file_path)
+    else:
+        print("Close current plot before opening a new one!")
 
 def process_file(file_path):
 
