@@ -3,11 +3,11 @@ import numpy as np
 import openpyxl
 
 # Set the size of the image to build the sheet more accurately and convert these weird numbers to actual height data
-height_uM = 9.899
-data_x = 6001
-x_uM = 3960
-data_y = 100
-y_uM = 3051
+height_uM = 9.899 # found on profilmonline
+data_x = 6001 # found on ASC file
+x_uM = 3960 # found on profilmonline
+data_y = 100 # found on ASC file
+y_uM = 3051 # found on profilmonline
 
 # Load the ASC file and skips the rows before the actual data
 with open('p2.ASC', 'r') as file:

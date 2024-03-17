@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import mplcursors
 from matplotlib import ticker
 import math
-
+import dragrectangle
 
 # Set the size of the image to build the sheet more accurately and convert these weird numbers to actual height data
 height_uM = 9.899 # found on profilmonline
@@ -36,9 +36,6 @@ for row_values in data:
 if row:
     table.append(row) # for the last row
 
-print(data.shape)
-print(int(data_x / data_y))
-print(data.shape, data.T.shape)
 # Plotting the data with a hot colormap
 plt.imshow(data.T, cmap='hot', aspect=(data_y/data_x) * (y_uM/x_uM)) # rotate
 plt.colorbar()  # Add a color bar for reference
@@ -61,6 +58,14 @@ plt.ylabel('Y-Distance (µM)')
 
 # interactivify the plot
 # mplcursors.cursor(hover=True).connect("add", lambda sel: sel.annotation.set_text(f"Value: {data[sel.target.index]}"))
+
+# Create the draggable rectangle
+ax = plt.gca()
+x_values = np.linspace(0, data_x, data_x + 1)
+y_values = np.linspace(0, data_y, data_y + 1)
+
+dr = dragrectangle.DragRectangle(ax, x_values, y_values, data)
+dr.connect()
 
 plt.show()
 
