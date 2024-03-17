@@ -15,6 +15,8 @@ data_y = 100 # found on ASC file
 y_uM = 3051 # found on profilmonline
 y_res = y_uM / data_y
 
+print("-----------------------------------------------------------------------")
+
 # Load the ASC file and skips the rows before the actual data
 with open('p2.ASC', 'r') as file:
     lines = file.readlines()
@@ -70,4 +72,3 @@ dr.connect()
 plt.show()
 
 print(f"Plotted numpy array as image with colormap and scale")
-print(np.max(data))

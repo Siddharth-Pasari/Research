@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 import numpy as np
+import math
 
 class DragRectangle:
     def __init__(self, ax, x_values, y_values, data):
@@ -50,25 +51,19 @@ class DragRectangle:
         # Get indices of selected area
         x0, y0 = self.press_event.xdata, self.press_event.ydata
         x1, y1 = event.xdata, event.ydata
-        print("Y0:", y0, "Y1:", y1)  # Debug print statement
-        x_indices = np.where((self.x_values >= min(x0, x1)) & (self.x_values <= max(x0, x1)))[0]
-        y_indices = np.where((self.y_values >= min(y0, y1)) & (self.y_values <= max(y0, y1)))[0]
 
-        print("X indices:", x_indices)
-        print("Y indices:", y_indices)
+        x_indices = [int(i) for i in range(math.ceil(x0), math.floor(x1))]
+        y_indices = [int(i) for i in range(math.ceil(y0), math.floor(y1))]
 
         # Get values within selected area
         self.selected_indices = []
-        for j in y_indices:
-            row_values = [self.data[j, i] for i in x_indices]
+        for j in x_indices:
+            row_values = [self.data[j, i] for i in y_indices]
             self.selected_indices.append(row_values)
-
-        print("Selected indices:", self.selected_indices)
 
         slicelist=[]
         
-        print(self.findImportantValues())
-        print(self.selected_indices)
+        print("Max, Min:", self.findImportantValues())
 
     def findImportantValues(self):
 
@@ -82,6 +77,6 @@ class DragRectangle:
                 max_list = sublist
         
         max_index = np.argmax(max_list)
-        #bottom_value = (max_list[max_index - 1] + max_list[max_index - 2]) / 2
+        bottom_value = "NAN" #(max_list[max_index - 1] + max_list[max_index - 2]) / 2
 
-        return max_value#, bottom_value
+        return max_value, bottom_value
