@@ -8,12 +8,12 @@ import dragrectangle
 import pandas as pd
 
 # Set the size of the image to build the sheet more accurately and convert these weird numbers to actual height data
-#height_uM = 9.899 # found on profilmonline
+height_uM = 9.899 # found on profilmonline
 data_x = 6001 # found on ASC file
-#x_uM = 3960 # found on profilmonline
+x_uM = 3960 # found on profilmonline
 data_y = 100 # found on ASC file
-#y_uM = 3051 # found on profilmonline
-#y_res = y_uM / data_y
+y_uM = 3051 # found on profilmonline
+y_res = y_uM / data_y
 
 print("-----------------------------------------------------------------------")
 
