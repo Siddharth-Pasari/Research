@@ -3,7 +3,6 @@ import pandas as pd
 import tkinter as tk
 from tkinter import filedialog
 from PIL import Image, ImageTk
-import numpy as np
 import openpyxl
 
 num=0
