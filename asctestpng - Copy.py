@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-#import mplcursors
+import mplcursors
 from matplotlib import ticker
 import math
 
@@ -44,12 +44,12 @@ plt.imshow(data.T, cmap='hot', aspect=(data_y/data_x) * (y_uM/x_uM)) # rotate
 plt.colorbar()  # Add a color bar for reference
 
 # create custom tick values
-x_ticks = np.linspace(0, data_x, int(x_uM / 500)) 
-y_ticks = np.linspace(0, data_y, int(y_uM / 500)) 
+x_ticks = np.linspace(0, data_x, int(y_uM / 500))  # due to the transpose, switch data_x and data_y here
+y_ticks = np.linspace(0, data_y, int(x_uM / 500))  # due to the transpose, switch data_x and data_y here
 
 # create custom tick labels
-x_tick_labels = ['{:.0f}'.format(x * (y_uM / data_x)) for x in x_ticks]  # due to the transpose, switch x_uM and y_uM here
-y_tick_labels = ['{:.0f}'.format(y * (x_uM / data_y)) for y in y_ticks]  # due to the transpose, switch x_uM and y_uM here
+x_tick_labels = ['{:.0f}'.format(x * (y_uM / data_x)) for x in x_ticks]
+y_tick_labels = ['{:.0f}'.format(y * (x_uM / data_y)) for y in y_ticks]
 
 # set ticks
 plt.yticks(x_ticks, x_tick_labels)
