@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 import cv2
 import dragrectangle
-import pandas as pd
+import re
 
 # Set the size of the image to build the sheet more accurately and convert these weird numbers to actual height data
 height_uM = 9.899 # found on profilmonline
@@ -47,10 +47,16 @@ def process_file(file_path):
     else:
         print("No plot to clear.")'''
 
+    global data_x, data_y
+    
     # Load the ASC file and skips the rows before the actual data
     with open(file_path, 'r') as file:
         lines = file.readlines()
         start_index = 9
+
+        # pulls the pixels of the image straight from the ASC file
+        data_y = line_2_numbers = int(re.search(r'\d+', lines[1]).group())
+        data_x = int(re.search(r'\d+', lines[2]).group())
 
     # Process the data and format into a table
     data = np.loadtxt(file_path, skiprows=start_index)
