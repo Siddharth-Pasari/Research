@@ -88,7 +88,7 @@ def get_file_path():
 def get_file_path2():
     global excel_path
     excel_path = filedialog.askopenfilename(initialdir="/", title="Select file",
-                                           filetypes=(("jpeg files", "*.jpg"), ("all files", "*.*")))
+                                           filetypes=(("Excel files", "*.xlsx"), ("all files", "*.*")))
 
 def display_image(file_path):
     global img, tk_img, canvas  # Declare as global to access outside of the function
