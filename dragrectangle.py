@@ -139,8 +139,7 @@ class DragRectangle:
         num=num+1
 
         data_measurements = [(num, max_value, bottom_value)]
-
-        print(data_measurements)
+        #print(data_measurements)
 
         update_excel_with_data(data_measurements, self.path)
 
