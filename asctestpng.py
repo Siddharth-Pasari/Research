@@ -95,7 +95,7 @@ def process_file(file_path):
     if row:
         table.append(row) # for the last row
 
-    #table = level(table)
+    table = level(table)
 
     # yes i only wrote this to look like the profilmonline colormap since i think it looks cool
     image = cv2.imread('Colormap.png')
