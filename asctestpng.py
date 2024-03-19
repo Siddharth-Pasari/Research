@@ -19,9 +19,23 @@ print("-----------------------------------------------------------------------")
 
 # to convert from weird ASC values to microns
 def convertToMicrons(value):
-    microns = value - lowest_asc # adjusts for negative numbers
-    microns = microns * (height_uM / (highest_asc - lowest_asc))
+    #convert value to microns
+    '''microns = value - lowest_asc # adjusts for negative numbers
+    microns = microns * (height_uM / (highest_asc - lowest_asc)) <-- anthonys old way'''
+
+    microns = value/1000
     return microns
+
+def level(list):
+    # calculates slope
+    first_point = list[0][0]
+    last_point = list[-1][0]
+    slope = (last_point - first_point) / len(list)
+
+    # Divide all rows by the slope
+    leveled_table = [[value / slope for value in row] for row in list]
+
+    return leveled_table
 
 def submit_values():
     global path, x_uM, y_uM, height_uM
@@ -79,6 +93,8 @@ def process_file(file_path):
 
     if row:
         table.append(row) # for the last row
+
+    table = level(table)
 
     # yes i only wrote this to look like the profilmonline colormap since i think it looks cool
     image = cv2.imread('Colormap.png')
