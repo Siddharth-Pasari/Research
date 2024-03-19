@@ -28,8 +28,9 @@ def convertToMicrons(value):
 
 def level(list):
     # calculates slope
-    first_point = list[0][0]
-    last_point = list[-1][0]
+    first_point = list[-1][0]
+    last_point = list[-1][-1]
+    print(first_point, last_point)
     slope = (last_point - first_point) / len(list)
 
     # Divide all rows by the slope
@@ -94,7 +95,7 @@ def process_file(file_path):
     if row:
         table.append(row) # for the last row
 
-    table = level(table)
+    #table = level(table)
 
     # yes i only wrote this to look like the profilmonline colormap since i think it looks cool
     image = cv2.imread('Colormap.png')
