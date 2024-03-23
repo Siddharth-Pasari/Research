@@ -13,9 +13,6 @@ def plot_2d_slice(height_values):
 
     Parameters:
     - height_values: 1D array of height values
-    
-    Returns:
-    - The y-value of the clicked point.
     """
     x_values = np.arange(len(height_values))
 
@@ -33,40 +30,40 @@ def plot_2d_slice(height_values):
 
     # Text annotation for displaying the y-value
     y_value_annotation = ax.annotate('', xy=(0, 0), xytext=(10, 10),
-                                      textcoords="offset points",
-                                      bbox=dict(boxstyle="round4", fc="cyan", ec="black", lw=1))
+                          
+           textcoords="offset points",
+                                     bbox=dict(boxstyle="round4", fc="cyan", ec="black", lw=1))
 
     # Variable to hold the y-value
-    clicked_y_value = None
+    y_value = None
 
     def on_move(event):
+        if not event.inaxes:
+            return
         x, y = event.xdata, event.ydata
+        nearest_x_index = np.clip(np.searchsorted(x_values, x), 1, len(x_values) - 1)
+        x0, x1 = x_values[nearest_x_index - 1], x_values[nearest_x_index]
+        y0, y1 = height_values[nearest_x_index - 1], height_values[nearest_x_index]
+        distance_to_x0 = abs(x - x0)
+        distance_to_x1 = abs(x - x1)
+        index = nearest_x_index - 1 if distance_to_x0 < distance_to_x1 else nearest_x_index
 
-        if(x is not None): # makes sure your cursor is on the map
-            nearest_x_index = np.clip(np.searchsorted(x_values, x), 1, len(x_values) - 1)
-            x0, x1 = x_values[nearest_x_index - 1], x_values[nearest_x_index]
-            y0, y1 = height_values[nearest_x_index - 1], height_values[nearest_x_index]
-            distance_to_x0 = abs(x - x0)
-            distance_to_x1 = abs(x - x1)
-            index = nearest_x_index - 1 if distance_to_x0 < distance_to_x1 else nearest_x_index
+        # Update the position of the marker and the vertical line
+        marker.set_data([x_values[index]], [height_values[index]])
+        cursor_line.set_xdata(x_values[index])
 
-            # Update the position of the marker and the vertical line
-            marker.set_data([x_values[index]], [height_values[index]])
-            cursor_line.set_xdata(x_values[index])
+        # Update the annotation text and position
+        y_value_annotation.set_text(f'({x_values[index]:.2f}, {height_values[index]:.2f})')
+        y_value_annotation.xy = (x_values[index], height_values[index])
 
-            # Update the annotation text and position
-            y_value_annotation.set_text(f'({x_values[index]:.2f}, {height_values[index]:.2f})')
-            y_value_annotation.xy = (x_values[index], height_values[index])
-
-            plt.draw()
+        plt.draw()
 
     def on_click(event):
-        nonlocal clicked_y_value
-        x, y = event.xdata, event.ydata
-
-        if(x is not None): # makes sure your cursor is on the map
-            clicked_y_value = height_values[np.clip(np.searchsorted(x_values, x), 1, len(x_values) - 1) - 1]
-            print(f"Recorded bottom value: {clicked_y_value}")
+        if not event.inaxes:
+            return
+        nonlocal y_value
+        y_value = height_values[np.clip(np.searchsorted(x_values, event.xdata), 1, len(x_values) - 1) - 1]
+        print(f"Recorded y-value: {y_value}")
 
     fig.canvas.mpl_connect('motion_notify_event', on_move)
     fig.canvas.mpl_connect('button_press_event', on_click)
@@ -74,8 +71,7 @@ def plot_2d_slice(height_values):
     ax.autoscale_view()  # Auto rescale the view after adding the marker
     plt.show()
 
-    return clicked_y_value
-
+    return y_value
 
 def update_excel_with_data(data_measurements, file_path):
     """
@@ -174,7 +170,7 @@ class DragRectangle:
 
         slicelist=[]
         
-        # print("Max, Min:", self.findImportantValues())
+        print("Max, Min:", self.findImportantValues())
 
     def findImportantValues(self):
         global num
