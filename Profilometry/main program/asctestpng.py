@@ -16,7 +16,6 @@ y_uM = 3051 # found on profilmonline
 
 print("-----------------------------------------------------------------------")
 
-
 # to convert from weird ASC values to microns
 def convertToMicrons(value):
     #convert value to microns
@@ -60,6 +59,12 @@ def open_file2():
 
 def process_file(file_path):
 
+    def format_coord(x,y):
+        # properly print some coordinates and other useful info
+        return f'{x:.2f},{y:.2f}, raw={data_raw[round(x), round(y)]:0.4f}, \
+uM={data_transpose[round(y), round(x)]:0.4f}\n \
+lowRow={np.min(data_raw[round(x),:])}'
+
     '''# Check if any plots are already open
     if plt.get_fignums():
         print("Clearing existing plot...")
@@ -79,13 +84,13 @@ def process_file(file_path):
         data_x = int(re.search(r'\d+', lines[2]).group())
 
     # Process the data and format into a table
-    data = np.loadtxt(file_path, skiprows=start_index)
+    data_raw = np.loadtxt(file_path, skiprows=start_index)
 
     global highest_asc, lowest_asc
-    highest_asc = np.max(data)
-    lowest_asc = np.min(data)
+    highest_asc = np.max(data_raw)
+    lowest_asc = np.min(data_raw)
 
-    data = np.vectorize(convertToMicrons)(data)
+    data = np.vectorize(convertToMicrons)(data_raw)
 
     table = []
     row = []
@@ -103,17 +108,19 @@ def process_file(file_path):
     table = level(table)
 
     # yes i only wrote this to look like the profilmonline colormap since i think it looks cool
-    image = cv2.imread('Profilometry\Colormap.png')
+    '''image = cv2.imread('Profilometry\Colormap.png')
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     colors = []
     for row in reversed(image_rgb):
         for color in row:
             colors.append(color / 255.0)  # Normalize the colors to range [0, 1]
-    custom_cmap = LinearSegmentedColormap.from_list('custom_colormap', colors)
+    custom_cmap = LinearSegmentedColormap.from_list('custom_colormap', colors)'''
 
     # Plotting the data with a custom colormap
-    plt.imshow(data.T, cmap=custom_cmap, aspect=(data_y/data_x) * (y_uM/x_uM)) # rotate
+    data_transpose = data.T
+    plt.imshow(data_transpose, cmap='jet', aspect=(data_y/data_x) * (y_uM/x_uM)) # rotate
     plt.colorbar()  # Add a color bar for reference
+    #fig=plt.figure()
 
     # create custom tick values
     x_ticks = np.linspace(0, data_x, int(x_uM / 500)) 
@@ -138,6 +145,8 @@ def process_file(file_path):
     ax = plt.gca()
     x_values = np.linspace(0, data_x, data_x + 1)
     y_values = np.linspace(0, data_y, data_y + 1)
+
+    ax.format_coord=format_coord
 
     dr = dragrectangle.DragRectangle(ax, x_values, y_values, data, path)
     dr.connect()
