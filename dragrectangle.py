@@ -8,36 +8,70 @@ num=0
 def plot_2d_slice(height_values):
     """
     Plots a 2D representation of a data slice given height values.
+    A vertical line and the y coordinate of the line associated with the current x-coordinate
+    of the mouse are displayed as the mouse moves. Clicking records the y-value.
 
     Parameters:
     - height_values: 1D array of height values
-
-    Returns:
-    - The y-value of the clicked point, or None if no point is clicked.
     """
-    # Generate x-axis values with the same length as height_values
-    x_values = np.arange(0, len(height_values))
+    x_values = np.arange(len(height_values))
 
-    # Plot the 2D representation
-    plt.figure()
-    plt.plot(x_values, height_values, marker='o', linestyle='-')
-    plt.xlabel('X')  # Set x-axis label
-    plt.ylabel('Height')  # Set y-axis label
-    plt.title('2D Representation of Data Slice')  # Set title
-    plt.grid(True)  # Add grid lines
+    fig, ax = plt.subplots()
+    ax.plot(x_values, height_values, 'o-')
+
+    # Set labels and title
+    ax.set(xlabel='X', ylabel='Height',
+           title='2D Representation of Data Slice')
+    ax.grid()
+
+    # Marker and line which will follow the mouse
+    marker, = ax.plot([0], [height_values[0]], marker='o', color="red", zorder=5)
+    cursor_line = ax.axvline(x=0, color='red', linestyle='--', lw=1)
+
+    # Text annotation for displaying the y-value
+    y_value_annotation = ax.annotate('', xy=(0, 0), xytext=(10, 10),
+                          
+           textcoords="offset points",
+                                     bbox=dict(boxstyle="round4", fc="cyan", ec="black", lw=1))
+
+    # Variable to hold the y-value
+    y_value = None
+
+    def on_move(event):
+        if not event.inaxes:
+            return
+        x, y = event.xdata, event.ydata
+        nearest_x_index = np.clip(np.searchsorted(x_values, x), 1, len(x_values) - 1)
+        x0, x1 = x_values[nearest_x_index - 1], x_values[nearest_x_index]
+        y0, y1 = height_values[nearest_x_index - 1], height_values[nearest_x_index]
+        distance_to_x0 = abs(x - x0)
+        distance_to_x1 = abs(x - x1)
+        index = nearest_x_index - 1 if distance_to_x0 < distance_to_x1 else nearest_x_index
+
+        # Update the position of the marker and the vertical line
+        marker.set_data([x_values[index]], [height_values[index]])
+        cursor_line.set_xdata(x_values[index])
+
+        # Update the annotation text and position
+        y_value_annotation.set_text(f'({x_values[index]:.2f}, {height_values[index]:.2f})')
+        y_value_annotation.xy = (x_values[index], height_values[index])
+
+        plt.draw()
+
+    def on_click(event):
+        if not event.inaxes:
+            return
+        nonlocal y_value
+        y_value = height_values[np.clip(np.searchsorted(x_values, event.xdata), 1, len(x_values) - 1) - 1]
+        print(f"Recorded y-value: {y_value}")
+
+    fig.canvas.mpl_connect('motion_notify_event', on_move)
+    fig.canvas.mpl_connect('button_press_event', on_click)
+
+    ax.autoscale_view()  # Auto rescale the view after adding the marker
     plt.show()
 
-    # Wait for user to click on the plot
-    clicked_points = plt.ginput(n=1, timeout=-1)
-    plt.close()  # Close the plot after capturing the click
-
-    if clicked_points:
-        x_clicked, y_clicked = clicked_points[0]  # Extract x and y coordinates of the clicked point
-        print(f"Clicked point coordinates: ({x_clicked}, {y_clicked})")
-        return y_clicked
-    else:
-        print("No point clicked.")
-        return None
+    return y_value
 
 def update_excel_with_data(data_measurements, file_path):
     """
