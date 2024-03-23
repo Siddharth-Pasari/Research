@@ -89,6 +89,7 @@ def plot_2d_slice(height_values, num, max_val, excel_path):
         plt.draw()
 
     def on_click(event):
+        global num
         num=num+1
         if not event.inaxes:
             return
