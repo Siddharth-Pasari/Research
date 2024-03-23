@@ -41,35 +41,40 @@ def plot_2d_slice(height_values):
 
     def on_move(event):
         x, y = event.xdata, event.ydata
-        nearest_x_index = np.clip(np.searchsorted(x_values, x), 1, len(x_values) - 1)
-        x0, x1 = x_values[nearest_x_index - 1], x_values[nearest_x_index]
-        y0, y1 = height_values[nearest_x_index - 1], height_values[nearest_x_index]
-        distance_to_x0 = abs(x - x0)
-        distance_to_x1 = abs(x - x1)
-        index = nearest_x_index - 1 if distance_to_x0 < distance_to_x1 else nearest_x_index
 
-        # Update the position of the marker and the vertical line
-        marker.set_data([x_values[index]], [height_values[index]])
-        cursor_line.set_xdata(x_values[index])
+        if(x is not None): # makes sure your cursor is on the map
+            nearest_x_index = np.clip(np.searchsorted(x_values, x), 1, len(x_values) - 1)
+            x0, x1 = x_values[nearest_x_index - 1], x_values[nearest_x_index]
+            y0, y1 = height_values[nearest_x_index - 1], height_values[nearest_x_index]
+            distance_to_x0 = abs(x - x0)
+            distance_to_x1 = abs(x - x1)
+            index = nearest_x_index - 1 if distance_to_x0 < distance_to_x1 else nearest_x_index
 
-        # Update the annotation text and position
-        y_value_annotation.set_text(f'({x_values[index]:.2f}, {height_values[index]:.2f})')
-        y_value_annotation.xy = (x_values[index], height_values[index])
+            # Update the position of the marker and the vertical line
+            marker.set_data([x_values[index]], [height_values[index]])
+            cursor_line.set_xdata(x_values[index])
 
-        plt.draw()
+            # Update the annotation text and position
+            y_value_annotation.set_text(f'({x_values[index]:.2f}, {height_values[index]:.2f})')
+            y_value_annotation.xy = (x_values[index], height_values[index])
+
+            plt.draw()
 
     def on_click(event):
         nonlocal clicked_y_value
-        clicked_y_value = height_values[np.clip(np.searchsorted(x_values, event.xdata), 1, len(x_values) - 1) - 1]
-        print(f"Recorded y-value: {clicked_y_value}")
+        x, y = event.xdata, event.ydata
+
+        if(x is not None): # makes sure your cursor is on the map
+            clicked_y_value = height_values[np.clip(np.searchsorted(x_values, x), 1, len(x_values) - 1) - 1]
+            print(f"Recorded bottom value: {clicked_y_value}")
+
+        return clicked_y_value
 
     fig.canvas.mpl_connect('motion_notify_event', on_move)
     fig.canvas.mpl_connect('button_press_event', on_click)
 
     ax.autoscale_view()  # Auto rescale the view after adding the marker
     plt.show()
-
-    return clicked_y_value
 
 
 def update_excel_with_data(data_measurements, file_path):
@@ -169,7 +174,7 @@ class DragRectangle:
 
         slicelist=[]
         
-        print("Max, Min:", self.findImportantValues())
+        # print("Max, Min:", self.findImportantValues())
 
     def findImportantValues(self):
         global num
@@ -202,10 +207,14 @@ class DragRectangle:
         else:
             bottom_value = np.nan
         
-        num=num+1'''
+        num=num+1
+        
+        This was the original code to automate finding the bottom'''
 
         bottom_value = plot_2d_slice(max_list)
         print(bottom_value)
+
+        print(f"Recorded top value: {max_value}")
 
         data_measurements = [(num, max_value, bottom_value)]
         #print(data_measurements)
