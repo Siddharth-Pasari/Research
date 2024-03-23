@@ -13,10 +13,10 @@ def plot_2d_slice(height_values):
     - height_values: 1D array of height values
 
     Returns:
-    None
+    - The y-value of the clicked point, or None if no point is clicked.
     """
-    # Generate x-axis values
-    x_values = np.arange(0, len(height_values) + 1)
+    # Generate x-axis values with the same length as height_values
+    x_values = np.arange(0, len(height_values))
 
     # Plot the 2D representation
     plt.figure()
@@ -26,6 +26,18 @@ def plot_2d_slice(height_values):
     plt.title('2D Representation of Data Slice')  # Set title
     plt.grid(True)  # Add grid lines
     plt.show()
+
+    # Wait for user to click on the plot
+    clicked_points = plt.ginput(n=1, timeout=-1)
+    plt.close()  # Close the plot after capturing the click
+
+    if clicked_points:
+        x_clicked, y_clicked = clicked_points[0]  # Extract x and y coordinates of the clicked point
+        print(f"Clicked point coordinates: ({x_clicked}, {y_clicked})")
+        return y_clicked
+    else:
+        print("No point clicked.")
+        return None
 
 def update_excel_with_data(data_measurements, file_path):
     """
@@ -146,7 +158,7 @@ class DragRectangle:
 
         max_index = np.argmax(max_list)
         
-        # Convert list to numpy array for easier manipulation and finds bottom based on a slope threshold
+        '''# Convert list to numpy array for easier manipulation and finds bottom based on a slope threshold
         slicearr = np.array(max_list)
         differences = np.diff(slicearr)
         threshold = 0.005  # Adjust the threshold as needed
@@ -157,7 +169,9 @@ class DragRectangle:
         else:
             bottom_value = np.nan
         
-        num=num+1
+        num=num+1'''
+
+        bottom_value = plot_2d_slice(max_list)
 
         data_measurements = [(num, max_value, bottom_value)]
         #print(data_measurements)
