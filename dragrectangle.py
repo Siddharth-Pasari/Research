@@ -5,6 +5,27 @@ import math
 import pandas as pd
 num=0
 
+def plot_2d_slice(height_values):
+    """
+    Plots a 2D representation of a data slice given height values.
+
+    Parameters:
+    - height_values: 1D array of height values
+
+    Returns:
+    None
+    """
+    # Generate x-axis values
+    x_values = np.arange(0, len(height_values) + 1)
+
+    # Plot the 2D representation
+    plt.figure()
+    plt.plot(x_values, height_values, marker='o', linestyle='-')
+    plt.xlabel('X')  # Set x-axis label
+    plt.ylabel('Height')  # Set y-axis label
+    plt.title('2D Representation of Data Slice')  # Set title
+    plt.grid(True)  # Add grid lines
+    plt.show()
 
 def update_excel_with_data(data_measurements, file_path):
     """
