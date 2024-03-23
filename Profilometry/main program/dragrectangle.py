@@ -89,6 +89,7 @@ def plot_2d_slice(height_values, num, max_val, excel_path):
         plt.draw()
 
     def on_click(event):
+        num=num+1
         if not event.inaxes:
             return
         nonlocal y_value
@@ -207,7 +208,6 @@ class DragRectangle:
         else:
             bottom_value = np.nan'''
         
-        num=num+1
 
         plot_2d_slice(max_list, num, max_value, self.path)
 
