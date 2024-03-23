@@ -106,7 +106,7 @@ def process_file(file_path):
             colors.append(color / 255.0)  # Normalize the colors to range [0, 1]
     custom_cmap = LinearSegmentedColormap.from_list('custom_colormap', colors)
 
-    # Plotting the data with a jet colormap
+    # Plotting the data with a custom colormap
     plt.imshow(data.T, cmap=custom_cmap, aspect=(data_y/data_x) * (y_uM/x_uM)) # rotate
     plt.colorbar()  # Add a color bar for reference
 
