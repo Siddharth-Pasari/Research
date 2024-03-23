@@ -13,6 +13,9 @@ def plot_2d_slice(height_values):
 
     Parameters:
     - height_values: 1D array of height values
+    
+    Returns:
+    - The y-value of the clicked point.
     """
     x_values = np.arange(len(height_values))
 
@@ -30,16 +33,13 @@ def plot_2d_slice(height_values):
 
     # Text annotation for displaying the y-value
     y_value_annotation = ax.annotate('', xy=(0, 0), xytext=(10, 10),
-                          
-           textcoords="offset points",
-                                     bbox=dict(boxstyle="round4", fc="cyan", ec="black", lw=1))
+                                      textcoords="offset points",
+                                      bbox=dict(boxstyle="round4", fc="cyan", ec="black", lw=1))
 
     # Variable to hold the y-value
-    y_value = None
+    clicked_y_value = None
 
     def on_move(event):
-        if not event.inaxes:
-            return
         x, y = event.xdata, event.ydata
         nearest_x_index = np.clip(np.searchsorted(x_values, x), 1, len(x_values) - 1)
         x0, x1 = x_values[nearest_x_index - 1], x_values[nearest_x_index]
@@ -59,11 +59,9 @@ def plot_2d_slice(height_values):
         plt.draw()
 
     def on_click(event):
-        if not event.inaxes:
-            return
-        nonlocal y_value
-        y_value = height_values[np.clip(np.searchsorted(x_values, event.xdata), 1, len(x_values) - 1) - 1]
-        print(f"Recorded y-value: {y_value}")
+        nonlocal clicked_y_value
+        clicked_y_value = height_values[np.clip(np.searchsorted(x_values, event.xdata), 1, len(x_values) - 1) - 1]
+        print(f"Recorded y-value: {clicked_y_value}")
 
     fig.canvas.mpl_connect('motion_notify_event', on_move)
     fig.canvas.mpl_connect('button_press_event', on_click)
@@ -71,7 +69,8 @@ def plot_2d_slice(height_values):
     ax.autoscale_view()  # Auto rescale the view after adding the marker
     plt.show()
 
-    return y_value
+    return clicked_y_value
+
 
 def update_excel_with_data(data_measurements, file_path):
     """
@@ -206,6 +205,7 @@ class DragRectangle:
         num=num+1'''
 
         bottom_value = plot_2d_slice(max_list)
+        print(bottom_value)
 
         data_measurements = [(num, max_value, bottom_value)]
         #print(data_measurements)
