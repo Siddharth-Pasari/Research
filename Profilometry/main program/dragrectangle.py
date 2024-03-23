@@ -35,7 +35,7 @@ def update_excel_with_data(data_measurements, file_path):
         # Write the DataFrame to the Excel file
         df.to_excel(writer, sheet_name='Sheet1', startrow=startrow, index=False, header=headers)
 
-def plot_2d_slice(height_values, num, max_val, excel_path):
+def plot_2d_slice(height_values, max_val, excel_path):
     """
     Plots a 2D representation of a data slice given height values.
     A vertical line and the y coordinate of the line associated with the current x-coordinate
@@ -143,7 +143,9 @@ class DragRectangle:
         self.is_dragging = True
 
     def on_right_click(self, event):
-        print("RIGHT CLICk")
+        data_measurements = [(num, "N/A", "N/A")]
+
+        update_excel_with_data(data_measurements, self.path)
 
     def on_motion(self, event):
         if not self.is_dragging or event.inaxes != self.ax:
@@ -217,4 +219,4 @@ class DragRectangle:
             bottom_value = np.nan'''
         
 
-        plot_2d_slice(max_list, num, max_value, self.path)
+        plot_2d_slice(max_list, max_value, self.path)
