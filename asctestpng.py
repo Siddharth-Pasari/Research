@@ -20,11 +20,11 @@ print("-----------------------------------------------------------------------")
 # to convert from weird ASC values to microns
 def convertToMicrons(value):
     #convert value to microns
-    '''microns = value - lowest_asc # adjusts for negative numbers
-    microns = microns * (height_uM / (highest_asc - lowest_asc)) <-- anthonys old way'''
-
-    microns = value/1000
-    return microns
+    if value < 0: # adjusts for negative numbers
+        value = 0
+    value = value * (height_uM / highest_asc)
+    
+    return value
 
 def level(list):
     # calculates slope
