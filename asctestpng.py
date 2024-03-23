@@ -40,18 +40,23 @@ def level(list):
 
 def submit_values():
     global path, x_uM, y_uM, height_uM
-    path = file_path_entry.get()
     x_uM = int(x_um_entry.get())
     y_uM = int(y_um_entry.get())
     height_uM = float(height_um_entry.get())
     
 def open_file():
+    global file_path
     if not plt.fignum_exists(1):
         file_path = filedialog.askopenfilename(filetypes=[("ASC files", "*.ASC")])
         if file_path:
             process_file(file_path)
     else:
         print("Close current plot before opening a new one!")
+
+def open_file2():
+    global path
+    if not plt.fignum_exists(1):
+        path = filedialog.askopenfilename(filetypes=[("excel files", "*.xlsx")])
 
 def process_file(file_path):
 
@@ -148,11 +153,8 @@ root.title("ASC File Processor")
 btn_open = tk.Button(root, text="Open ASC File", command=open_file)
 btn_open.pack()
 
-file_path_label = tk.Label(root, text="File Path:")
+file_path_label = tk.Button(root, text="Open Excel File", command=open_file2)
 file_path_label.pack()
-
-file_path_entry = tk.Entry(root)
-file_path_entry.pack()
 
 x_um_label = tk.Label(root, text="X uM (ProfilmOnline):")
 x_um_label.pack()
