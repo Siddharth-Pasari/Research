@@ -130,12 +130,19 @@ class DragRectangle:
         if event.inaxes != self.ax:
             return
 
+        if event.button == 3:  # Right-click event
+            self.on_right_click(event)
+            return
+
         self.press_event = event
         self.rect.set_width(0)
         self.rect.set_height(0)
         self.rect.set_xy((event.xdata, event.ydata))
         self.ax.add_patch(self.rect)
         self.is_dragging = True
+
+    def on_right_click(self, event):
+        print("RIGHT CLICk")
 
     def on_motion(self, event):
         if not self.is_dragging or event.inaxes != self.ax:
@@ -210,4 +217,3 @@ class DragRectangle:
         
 
         plot_2d_slice(max_list, num, max_value, self.path)
-
