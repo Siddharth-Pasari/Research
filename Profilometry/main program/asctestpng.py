@@ -48,7 +48,7 @@ def submit_values():
 def open_file():
     global file_path
     if not plt.fignum_exists(1):
-        file_path = filedialog.askopenfilename(filetypes=[("ASC files", "*.ASC"), ("OPDX files", "*.opdx")])
+        file_path = filedialog.askopenfilename(filetypes=[("OPDX files", "*.opdx"), ("ASC files", "*.ASC")])
         if file_path:
             process_file(file_path)
     else:
@@ -116,7 +116,9 @@ def process_file(file_path):
     else:
         # opdx file
         _, _, data_raw, _ = read_opdx(file_path)
-        data = data_raw * 1e6  # now in microns instead of meters
+
+        minimum = data_raw.min()
+        data = ((data_raw - minimum) * 1e6) # now in microns instead of meters
         data_y, data_x = data_raw.shape
 
     aspect_ratio = (data_y/data_x) * (y_uM/x_uM)
