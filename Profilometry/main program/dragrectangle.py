@@ -93,7 +93,7 @@ def plot_2d_slice(height_values, num, max_val, excel_path):
             return
         nonlocal y_value
         y_value = height_values[np.clip(np.searchsorted(x_values, event.xdata), 1, len(x_values) - 1) - 1]
-        print(f"Recorded y-value: {max_val, y_value}")
+        print(f"Top, Bottom: {max_val, y_value}")
 
         data_measurements = [(num, max_val, y_value)]
 
