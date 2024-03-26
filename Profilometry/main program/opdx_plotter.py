@@ -71,7 +71,7 @@ def process_file(file_path):
     data_transpose = data.T
 
     # yes i only wrote this to look like the profilmonline colormap since i think it looks cool
-    image = cv2.imread('Profilometry\Colormap.png')
+    image = cv2.imread(r"Profilometry\Colormap.png")
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     colors = []
     for row in reversed(image_rgb):
