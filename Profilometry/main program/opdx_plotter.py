@@ -9,23 +9,14 @@ import re
 import math
 from opdx_reader import DektakLoad
 
-# Set the size of the image to build the sheet more accurately and convert these weird numbers to actual height data
+print("-----------------------------------------------------------------------")
+
+'''# Set the size of the image to build the sheet more accurately and convert these weird numbers to actual height data
 height_uM = 9.899 # found on profilmonline
 data_x = 6001 # found on ASC file
 x_uM = 3960 # found on profilmonline
 data_y = 100 # found on ASC file
-y_uM = 3051 # found on profilmonline
-
-print("-----------------------------------------------------------------------")
-
-# to convert from weird ASC values to microns
-def convertToMicrons(value):
-    #convert value to microns
-    if value < 0: # adjusts for negative numbers
-        value = 0
-    value = value * (height_uM / highest_asc)
-    
-    return value
+y_uM = 3051 # found on profilmonline'''
 
 def level(list):
     # calculates slope
@@ -48,7 +39,7 @@ def submit_values():
 def open_file():
     global file_path
     if not plt.fignum_exists(1):
-        file_path = filedialog.askopenfilename(filetypes=[("OPDX files", "*.opdx"), ("ASC files", "*.ASC")])
+        file_path = filedialog.askopenfilename(filetypes=[("OPDX files", "*.opdx")])
         if file_path:
             process_file(file_path)
     else:
@@ -63,7 +54,7 @@ def read_opdx(file_path):
     loader = DektakLoad(file_path)
     x, y, z = loader.get_data_2D()
     metadata = loader.get_metadata()
-    return x, y, z.T, metadata # z transposed simply to match ASC format
+    return y, x, z.T, metadata # x and y swapped because of the TRANSPOSE
 
 def process_file(file_path):
 
@@ -71,55 +62,16 @@ def process_file(file_path):
         # properly print some coordinates and other useful info
         return f'{x:.2f},{y:.2f}, raw={data[math.floor(x), math.floor(y)]:0.4f}' #, uM={data_transpose[round(y), round(x)]:0.4f}'
 
-    '''# Check if any plots are already open
-    if plt.get_fignums():
-        print("Clearing existing plot...")
-        plt.close()
-    else:
-        print("No plot to clear.")'''
-
     global data_x, data_y
-    
-    if '.asc' in file_path.lower():
-        # Load the ASC file and skips the rows before the actual data
-        with open(file_path, 'r') as file:
-            lines = file.readlines()
-            start_index = 8 # not 9!
 
-            # pulls the pixels of the image straight from the ASC file
-            data_y = line_2_numbers = int(re.search(r'\d+', lines[1]).group())
-            data_x = int(re.search(r'\d+', lines[2]).group())
+    # opdx file
+    x, y, data_raw, metadata = read_opdx(file_path)
+    minimum = data_raw.min()
+    data = ((data_raw - minimum) * 1e6) # now in microns instead of meters
+    data_y, data_x = data_raw.shape
 
-        # Process the data and format into a table
-        data_raw = np.loadtxt(file_path, skiprows=start_index)
-
-        global highest_asc, lowest_asc
-        highest_asc = np.max(data_raw)
-        lowest_asc = np.min(data_raw)
-
-        data = np.vectorize(convertToMicrons)(data_raw)
-
-        table = []
-        row = []
-        for row_values in data:
-            for value in row_values:
-                if len(row) < data_x:
-                    row.append(value)
-                else:
-                    table.append(row)
-                    row = [value]
-
-        if row:
-            table.append(row) # for the last row
-
-        table = level(table)
-    else:
-        # opdx file
-        _, _, data_raw, _ = read_opdx(file_path)
-
-        minimum = data_raw.min()
-        data = ((data_raw - minimum) * 1e6) # now in microns instead of meters
-        data_y, data_x = data_raw.shape
+    x_uM = x.max()
+    y_uM = y.max()
 
     aspect_ratio = (data_y/data_x) * (y_uM/x_uM)
     data_transpose = data.T
@@ -173,13 +125,14 @@ def process_file(file_path):
     print(f"Plotted numpy array as image with colormap and scale")
 
 root = tk.Tk()
-root.title("ASC File Processor")
-
-btn_open = tk.Button(root, text="Open ASC or opdx File", command=open_file)
-btn_open.pack()
+root.title("OPDX File Processor")
 
 file_path_label = tk.Button(root, text="Open Excel File", command=open_file2)
 file_path_label.pack()
+
+
+btn_open = tk.Button(root, text="Open OPDX file", command=open_file)
+btn_open.pack()
 
 x_um_label = tk.Label(root, text="X uM (ProfilmOnline):")
 x_um_label.pack()
@@ -193,16 +146,13 @@ y_um_label.pack()
 y_um_entry = tk.Entry(root)
 y_um_entry.pack()
 
-height_um_label = tk.Label(root, text="Height uM (ProfilmOnline):")
-height_um_label.pack()
-
 height_um_entry = tk.Entry(root)
 height_um_entry.pack()
 
 submit_button = tk.Button(root, text="Submit", command=submit_values)
 submit_button.pack()
 
-info = tk.Label(root, text = "Fill in text boxes, then click submit. After that, choose an ASC file. \n Before loading a new file, manually X out of the current one.")
+info = tk.Label(root, text = "Choose an excel file and then open an opdx file\nto plot it and gather data by dragging a rectangle.\nTo return N/A values, right click.")
 info.pack()
 
 # Start the Tkinter event loop

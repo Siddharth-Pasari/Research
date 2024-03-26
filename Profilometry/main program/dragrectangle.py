@@ -5,37 +5,7 @@ import math
 import pandas as pd
 num=0
 
-def update_excel_with_data(data_measurements, file_path):
-    """
-    Inserts a list of data measurements into an Excel sheet.
-
-    Parameters:
-    - data_measurements: A list of tuples containing (area, mean, std_dev, min_val, max_val)
-    - file_path: Path to the Excel file where the data is to be inserted
-    """
-
-    # Convert the list of tuples to a pandas DataFrame
-    df = pd.DataFrame(data_measurements, columns=['Num','Top','Bottom'])
-    
-    # Open the Excel file and append the DataFrame
-    with pd.ExcelWriter(file_path, mode='a', engine='openpyxl', if_sheet_exists='overlay') as writer:
-        # Get the last row with data in the existing sheet
-        # If the file or sheet does not exist yet, it will start from the beginning
-        try:
-            startrow = writer.sheets['Sheet1'].max_row
-        except KeyError:
-            startrow = 0
-        
-        # If starting on a new sheet, write headers, otherwise skip them
-        if startrow == 0:
-            headers = True
-        else:
-            headers = False
-        
-        # Write the DataFrame to the Excel file
-        df.to_excel(writer, sheet_name='Sheet1', startrow=startrow, index=False, header=headers)
-
-def plot_2d_slice(height_values, max_val, excel_path):
+def plot_2d_slice(height_values):
     """
     Plots a 2D representation of a data slice given height values.
     A vertical line and the y coordinate of the line associated with the current x-coordinate
@@ -89,25 +59,50 @@ def plot_2d_slice(height_values, max_val, excel_path):
         plt.draw()
 
     def on_click(event):
-        global num
-        num=num+1
-        if not event.inaxes:
-            return
-        nonlocal y_value
-        y_value = height_values[np.clip(np.searchsorted(x_values, event.xdata), 1, len(x_values) - 1) - 1]
-        print(f"Recorded y-value: {max_val, y_value}")
 
-        data_measurements = [(num, max_val, y_value)]
-
-        update_excel_with_data(data_measurements, excel_path)
-
-        plt.close()
+            if not event.inaxes:
+                return
+            nonlocal y_value
+            y_value = height_values[np.clip(np.searchsorted(x_values, event.xdata), 1, len(x_values) - 1) - 1]
+            print(f"Recorded y-value: {y_value}")
 
     fig.canvas.mpl_connect('motion_notify_event', on_move)
     fig.canvas.mpl_connect('button_press_event', on_click)
 
     ax.autoscale_view()  # Auto rescale the view after adding the marker
     plt.show()
+
+    return y_value
+
+def update_excel_with_data(data_measurements, file_path):
+    """
+    Inserts a list of data measurements into an Excel sheet.
+
+    Parameters:
+    - data_measurements: A list of tuples containing (area, mean, std_dev, min_val, max_val)
+    - file_path: Path to the Excel file where the data is to be inserted
+    """
+
+    # Convert the list of tuples to a pandas DataFrame
+    df = pd.DataFrame(data_measurements, columns=['Num','Top','Bottom'])
+    
+    # Open the Excel file and append the DataFrame
+    with pd.ExcelWriter(file_path, mode='a', engine='openpyxl', if_sheet_exists='overlay') as writer:
+        # Get the last row with data in the existing sheet
+        # If the file or sheet does not exist yet, it will start from the beginning
+        try:
+            startrow = writer.sheets['Sheet1'].max_row
+        except KeyError:
+            startrow = 0
+        
+        # If starting on a new sheet, write headers, otherwise skip them
+        if startrow == 0:
+            headers = True
+        else:
+            headers = False
+        
+        # Write the DataFrame to the Excel file
+        df.to_excel(writer, sheet_name='Sheet1', startrow=startrow, index=False, header=headers)
 
 
 class DragRectangle:
@@ -131,23 +126,12 @@ class DragRectangle:
         if event.inaxes != self.ax:
             return
 
-        if event.button == 3:  # Right-click event
-            self.on_right_click(event)
-            return
-
         self.press_event = event
         self.rect.set_width(0)
         self.rect.set_height(0)
         self.rect.set_xy((event.xdata, event.ydata))
         self.ax.add_patch(self.rect)
         self.is_dragging = True
-
-    def on_right_click(self, event):
-        global num
-        num=num+1
-        data_measurements = [(num, "N/A", "N/A")]
-
-        update_excel_with_data(data_measurements, self.path)
 
     def on_motion(self, event):
         if not self.is_dragging or event.inaxes != self.ax:
@@ -187,7 +171,7 @@ class DragRectangle:
 
         slicelist=[]
         
-        self.findImportantValues()
+        print("Max, Min:", self.findImportantValues())
 
     def findImportantValues(self):
         global num
@@ -195,14 +179,17 @@ class DragRectangle:
         if not self.selected_indices:
             return np.nan, np.nan  # Return NaN values if selected_indices is empty
 
-        # finds the row containing the peak
+        # Find the index of the max_value
         max_value = float('-inf')
-        max_list = None
-        for sublist in self.selected_indices:
+        max_index = None
+        for i, sublist in enumerate(self.selected_indices):
             sublist_max = max(sublist)
             if sublist_max > max_value:
                 max_value = sublist_max
-                max_list = sublist
+                max_index = i
+
+        # Create a list of values from all sublists at max_index
+        max_list = [sublist[max_index] for sublist in self.selected_indices]
         
         if max_list is None:
             return np.nan, np.nan  # Return NaN values if max_list is None
@@ -218,7 +205,15 @@ class DragRectangle:
             bottom_index = np.argmax(differences > threshold)
             bottom_value = slicearr[bottom_index]
         else:
-            bottom_value = np.nan'''
+            bottom_value = np.nan
         
+        num=num+1'''
 
-        plot_2d_slice(max_list, max_value, self.path)
+        bottom_value = plot_2d_slice(max_list)
+
+        data_measurements = [(num, max_value, bottom_value)]
+        #print(data_measurements)
+
+        update_excel_with_data(data_measurements, self.path)
+
+        return max_value, bottom_value
