@@ -35,7 +35,7 @@ def update_excel_with_data(data_measurements, file_path):
         # Write the DataFrame to the Excel file
         df.to_excel(writer, sheet_name='Sheet1', startrow=startrow, index=False, header=headers)
 
-def plot_2d_slice(height_values, num, max_val, excel_path):
+def plot_2d_slice(height_values, max_val, excel_path):
     """
     Plots a 2D representation of a data slice given height values.
     A vertical line and the y coordinate of the line associated with the current x-coordinate
@@ -89,11 +89,13 @@ def plot_2d_slice(height_values, num, max_val, excel_path):
         plt.draw()
 
     def on_click(event):
+        global num
+        num=num+1
         if not event.inaxes:
             return
         nonlocal y_value
         y_value = height_values[np.clip(np.searchsorted(x_values, event.xdata), 1, len(x_values) - 1) - 1]
-        print(f"Top, Bottom: {max_val, y_value}")
+        print(f"Recorded y-value: {max_val, y_value}")
 
         data_measurements = [(num, max_val, y_value)]
 
@@ -106,6 +108,7 @@ def plot_2d_slice(height_values, num, max_val, excel_path):
 
     ax.autoscale_view()  # Auto rescale the view after adding the marker
     plt.show()
+
 
 class DragRectangle:
     def __init__(self, ax, x_values, y_values, data, path):
@@ -128,12 +131,23 @@ class DragRectangle:
         if event.inaxes != self.ax:
             return
 
+        if event.button == 3:  # Right-click event
+            self.on_right_click(event)
+            return
+
         self.press_event = event
         self.rect.set_width(0)
         self.rect.set_height(0)
         self.rect.set_xy((event.xdata, event.ydata))
         self.ax.add_patch(self.rect)
         self.is_dragging = True
+
+    def on_right_click(self, event):
+        global num
+        num=num+1
+        data_measurements = [(num, "N/A", "N/A")]
+
+        update_excel_with_data(data_measurements, self.path)
 
     def on_motion(self, event):
         if not self.is_dragging or event.inaxes != self.ax:
@@ -206,6 +220,5 @@ class DragRectangle:
         else:
             bottom_value = np.nan'''
         
-        num=num+1
 
-        plot_2d_slice(max_list, num, max_value, self.path)
+        plot_2d_slice(max_list, max_value, self.path)

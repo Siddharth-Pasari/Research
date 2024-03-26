@@ -127,7 +127,7 @@ file_path_label.pack()
 btn_open = tk.Button(root, text="Open OPDX file", command=open_file)
 btn_open.pack()
 
-info = tk.Label(root, text = "Choose an excel file and then open an opdx file\nto plot it and gather data by dragging a rectangle.\nTo return N/A values, right click.")
+info = tk.Label(root, text = "Choose an excel file and then open an opdx file\nto plot it and gather data by dragging a rectangle.\nTo return N/A values, right click on the 3D PLOT\nand not the 2d graph.")
 info.pack()
 
 # Start the Tkinter event loop
