@@ -29,12 +29,6 @@ def level(list):
     leveled_table = [[value / slope for value in row] for row in list]
 
     return leveled_table
-
-def submit_values():
-    global path, x_uM, y_uM, height_uM
-    x_uM = int(x_um_entry.get())
-    y_uM = int(y_um_entry.get())
-    height_uM = float(height_um_entry.get())
     
 def open_file():
     global file_path
@@ -130,27 +124,8 @@ root.title("OPDX File Processor")
 file_path_label = tk.Button(root, text="Open Excel File", command=open_file2)
 file_path_label.pack()
 
-
 btn_open = tk.Button(root, text="Open OPDX file", command=open_file)
 btn_open.pack()
-
-x_um_label = tk.Label(root, text="X uM (ProfilmOnline):")
-x_um_label.pack()
-
-x_um_entry = tk.Entry(root)
-x_um_entry.pack()
-
-y_um_label = tk.Label(root, text="Y uM (ProfilmOnline):")
-y_um_label.pack()
-
-y_um_entry = tk.Entry(root)
-y_um_entry.pack()
-
-height_um_entry = tk.Entry(root)
-height_um_entry.pack()
-
-submit_button = tk.Button(root, text="Submit", command=submit_values)
-submit_button.pack()
 
 info = tk.Label(root, text = "Choose an excel file and then open an opdx file\nto plot it and gather data by dragging a rectangle.\nTo return N/A values, right click.")
 info.pack()

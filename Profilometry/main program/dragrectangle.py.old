@@ -5,6 +5,76 @@ import math
 import pandas as pd
 num=0
 
+def plot_2d_slice(height_values):
+    """
+    Plots a 2D representation of a data slice given height values.
+    A vertical line and the y coordinate of the line associated with the current x-coordinate
+    of the mouse are displayed as the mouse moves. Clicking records the y-value.
+
+    Parameters:
+    - height_values: 1D array of height values
+    """
+    x_values = np.arange(len(height_values))
+
+    fig, ax = plt.subplots()
+    ax.plot(x_values, height_values, 'o-')
+
+    # Set labels and title
+    ax.set(xlabel='X', ylabel='Height',
+           title='2D Representation of Data Slice')
+    ax.grid()
+
+    # Marker and line which will follow the mouse
+    marker, = ax.plot([0], [height_values[0]], marker='o', color="red", zorder=5)
+    cursor_line = ax.axvline(x=0, color='red', linestyle='--', lw=1)
+
+    # Text annotation for displaying the y-value
+    y_value_annotation = ax.annotate('', xy=(0, 0), xytext=(10, 10),
+                          
+           textcoords="offset points",
+                                     bbox=dict(boxstyle="round4", fc="cyan", ec="black", lw=1))
+
+    # Variable to hold the y-value
+    self.y_value = None
+
+    def on_move(event):
+        if not event.inaxes:
+            return
+        x, y = event.xdata, event.ydata
+        nearest_x_index = np.clip(np.searchsorted(x_values, x), 1, len(x_values) - 1)
+        x0, x1 = x_values[nearest_x_index - 1], x_values[nearest_x_index]
+        y0, y1 = height_values[nearest_x_index - 1], height_values[nearest_x_index]
+        distance_to_x0 = abs(x - x0)
+        distance_to_x1 = abs(x - x1)
+        index = nearest_x_index - 1 if distance_to_x0 < distance_to_x1 else nearest_x_index
+
+        # Update the position of the marker and the vertical line
+        marker.set_data([x_values[index]], [height_values[index]])
+        cursor_line.set_xdata(x_values[index])
+
+        # Update the annotation text and position
+        y_value_annotation.set_text(f'({x_values[index]:.2f}, {height_values[index]:.2f})')
+        y_value_annotation.xy = (x_values[index], height_values[index])
+
+        plt.draw()
+
+    def on_click(event):
+
+            if not event.inaxes:
+                return
+ 
+            self.y_value = height_values[np.clip(np.searchsorted(x_values, event.xdata), 1, len(x_values) - 1) - 1]
+            print(f"Recorded y-value: {y_value}")
+
+ 
+    ax.autoscale_view()  # Auto rescale the view after adding the marker
+    plt.show(block=True)
+
+    fig.canvas.mpl_connect('motion_notify_event', on_move)
+    fig.canvas.mpl_connect('button_press_event', on_click)
+
+    return y_value
+
 def update_excel_with_data(data_measurements, file_path):
     """
     Inserts a list of data measurements into an Excel sheet.
@@ -35,77 +105,6 @@ def update_excel_with_data(data_measurements, file_path):
         # Write the DataFrame to the Excel file
         df.to_excel(writer, sheet_name='Sheet1', startrow=startrow, index=False, header=headers)
 
-def plot_2d_slice(height_values, num, max_val, excel_path):
-    """
-    Plots a 2D representation of a data slice given height values.
-    A vertical line and the y coordinate of the line associated with the current x-coordinate
-    of the mouse are displayed as the mouse moves. Clicking records the y-value.
-
-    Parameters:
-    - height_values: 1D array of height values
-    """
-    x_values = np.arange(len(height_values))
-
-    fig, ax = plt.subplots()
-    ax.plot(x_values, height_values, 'o-')
-
-    # Set labels and title
-    ax.set(xlabel='X', ylabel='Height',
-           title='2D Representation of Data Slice')
-    ax.grid()
-
-    # Marker and line which will follow the mouse
-    marker, = ax.plot([0], [height_values[0]], marker='o', color="red", zorder=5)
-    cursor_line = ax.axvline(x=0, color='red', linestyle='--', lw=1)
-
-    # Text annotation for displaying the y-value
-    y_value_annotation = ax.annotate('', xy=(0, 0), xytext=(10, 10),
-                          
-           textcoords="offset points",
-                                     bbox=dict(boxstyle="round4", fc="cyan", ec="black", lw=1))
-
-    # Variable to hold the y-value
-    y_value = None
-
-    def on_move(event):
-        if not event.inaxes:
-            return
-        x, y = event.xdata, event.ydata
-        nearest_x_index = np.clip(np.searchsorted(x_values, x), 1, len(x_values) - 1)
-        x0, x1 = x_values[nearest_x_index - 1], x_values[nearest_x_index]
-        y0, y1 = height_values[nearest_x_index - 1], height_values[nearest_x_index]
-        distance_to_x0 = abs(x - x0)
-        distance_to_x1 = abs(x - x1)
-        index = nearest_x_index - 1 if distance_to_x0 < distance_to_x1 else nearest_x_index
-
-        # Update the position of the marker and the vertical line
-        marker.set_data([x_values[index]], [height_values[index]])
-        cursor_line.set_xdata(x_values[index])
-
-        # Update the annotation text and position
-        y_value_annotation.set_text(f'({x_values[index]:.2f}, {height_values[index]:.2f})')
-        y_value_annotation.xy = (x_values[index], height_values[index])
-
-        plt.draw()
-
-    def on_click(event):
-        if not event.inaxes:
-            return
-        nonlocal y_value
-        y_value = height_values[np.clip(np.searchsorted(x_values, event.xdata), 1, len(x_values) - 1) - 1]
-        print(f"Recorded y-value: {max_val, y_value}")
-
-        data_measurements = [(num, max_val, y_value)]
-
-        update_excel_with_data(data_measurements, excel_path)
-
-        plt.close()
-
-    fig.canvas.mpl_connect('motion_notify_event', on_move)
-    fig.canvas.mpl_connect('button_press_event', on_click)
-
-    ax.autoscale_view()  # Auto rescale the view after adding the marker
-    plt.show()
 
 class DragRectangle:
     def __init__(self, ax, x_values, y_values, data, path):
@@ -118,6 +117,7 @@ class DragRectangle:
         self.is_dragging = False
         self.press_event = None
         self.selected_indices = []
+        self.y_value = None
 
     def connect(self):
         self.cidpress = self.ax.figure.canvas.mpl_connect('button_press_event', self.on_press)
@@ -173,13 +173,22 @@ class DragRectangle:
 
         slicelist=[]
         
-        self.findImportantValues()
+        print("Max, Min:", self.findImportantValues())
 
     def findImportantValues(self):
         global num
 
         if not self.selected_indices:
             return np.nan, np.nan  # Return NaN values if selected_indices is empty
+
+        '''# Find the index of the max_value
+        max_value = float('-inf')
+        max_index = None
+        for i, sublist in enumerate(self.selected_indices):
+            sublist_max = max(sublist)
+            if sublist_max > max_value:
+                max_value = sublist_max
+                max_index = i'''
 
         # finds the row containing the peak
         max_value = float('-inf')
@@ -189,6 +198,9 @@ class DragRectangle:
             if sublist_max > max_value:
                 max_value = sublist_max
                 max_list = sublist
+
+        '''# Create a list of values from all sublists at max_index
+        max_list = [sublist[max_index] for sublist in self.selected_indices]'''
         
         if max_list is None:
             return np.nan, np.nan  # Return NaN values if max_list is None
@@ -204,8 +216,15 @@ class DragRectangle:
             bottom_index = np.argmax(differences > threshold)
             bottom_value = slicearr[bottom_index]
         else:
-            bottom_value = np.nan'''
+            bottom_value = np.nan
         
-        num=num+1
+        num=num+1'''
 
-        plot_2d_slice(max_list, num, max_value, self.path)
+        bottom_value = plot_2d_slice(max_list)
+
+        data_measurements = [(num, max_value, bottom_value)]
+        #print(data_measurements)
+
+        update_excel_with_data(data_measurements, self.path)
+
+        return max_value, bottom_value
