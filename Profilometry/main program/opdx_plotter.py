@@ -18,17 +18,9 @@ x_uM = 3960 # found on profilmonline
 data_y = 100 # found on ASC file
 y_uM = 3051 # found on profilmonline'''
 
-def level(list):
-    # calculates slope
-    first_point = list[-1][0]
-    last_point = list[-1][-1]
-    print(first_point, last_point)
-    slope = (last_point - first_point) / len(list)
-
-    # Divide all rows by the slope
-    leveled_table = [[value / slope for value in row] for row in list]
-
-    return leveled_table
+def level(array):
+    pass
+    # TBD, may make a way to level via the plot itself to ensure less random error due to the peak placement, etc.
     
 def open_file():
     global file_path
@@ -69,6 +61,7 @@ def process_file(file_path):
 
     aspect_ratio = (data_y/data_x) * (y_uM/x_uM)
     data_transpose = data.T
+    data_transpose = level(data_transpose)
 
     # yes i only wrote this to look like the profilmonline colormap since i think it looks cool
     image = cv2.imread(r"Profilometry\Colormap.png")
