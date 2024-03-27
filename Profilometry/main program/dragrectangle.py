@@ -5,37 +5,36 @@ import math
 import pandas as pd
 num=0
 
-def update_excel_with_data(data_measurements, file_path):
-    """
-    Inserts a list of data measurements into an Excel sheet.
+def update_excel_with_data(data_measurements, file_path, num):
+    print(data_measurements, num)
 
-    Parameters:
-    - data_measurements: A list of tuples containing (area, mean, std_dev, min_val, max_val)
-    - file_path: Path to the Excel file where the data is to be inserted
-    """
+    # Create a DataFrame with specified column names
+    df = pd.DataFrame(data_measurements, columns=['Num', 'Top', 'Bottom', 'Difference'])
 
-    # Convert the list of tuples to a pandas DataFrame
-    df = pd.DataFrame(data_measurements, columns=['Num','Top','Bottom'])
-    
     # Open the Excel file and append the DataFrame
     with pd.ExcelWriter(file_path, mode='a', engine='openpyxl', if_sheet_exists='overlay') as writer:
         # Get the last row with data in the existing sheet
-        # If the file or sheet does not exist yet, it will start from the beginning
         try:
             startrow = writer.sheets['Sheet1'].max_row
         except KeyError:
             startrow = 0
-        
-        # If starting on a new sheet, write headers, otherwise skip them
-        if startrow == 0:
-            headers = True
+
+        # Determine if a new blank row should be inserted
+        if (num-1) % 16 == 0 and startrow != 0:
+            startrow += 1  # Increment startrow to insert data after the new blank row
+
+        # Determine if headers need to be written
+        if num == 1:
+            headers = ['Num', 'Top', 'Bottom', 'Difference']
         else:
             headers = False
-        
-        # Write the DataFrame to the Excel file
+
+        # Preserve any existing data in the file by using startrow accordingly
         df.to_excel(writer, sheet_name='Sheet1', startrow=startrow, index=False, header=headers)
 
+
 def plot_2d_slice(height_values, max_val, excel_path):
+    
     """
     Plots a 2D representation of a data slice given height values.
     A vertical line and the y coordinate of the line associated with the current x-coordinate
@@ -65,7 +64,7 @@ def plot_2d_slice(height_values, max_val, excel_path):
                                      bbox=dict(boxstyle="round4", fc="cyan", ec="black", lw=1))
 
     # Variable to hold the y-value
-    y_value = None
+    bottom_val = None
 
     def on_move(event):
         if not event.inaxes:
@@ -93,13 +92,14 @@ def plot_2d_slice(height_values, max_val, excel_path):
         num=num+1
         if not event.inaxes:
             return
-        nonlocal y_value
-        y_value = height_values[np.clip(np.searchsorted(x_values, event.xdata), 1, len(x_values) - 1) - 1]
-        print(f"Recorded y-value: {max_val, y_value}")
+        nonlocal bottom_val
+        bottom_val = height_values[np.clip(np.searchsorted(x_values, event.xdata), 1, len(x_values) - 1) - 1]
 
-        data_measurements = [(num, max_val, y_value)]
+        difference = max_val - bottom_val
 
-        update_excel_with_data(data_measurements, excel_path)
+        data_measurements = [(num, max_val, bottom_val, difference)]
+
+        update_excel_with_data(data_measurements, excel_path, num)
 
         plt.close()
 
