@@ -61,7 +61,7 @@ def process_file(file_path):
 
     aspect_ratio = (data_y/data_x) * (y_uM/x_uM)
     data_transpose = data.T
-    data_transpose = level(data_transpose)
+    # data_transpose = level(data_transpose)
 
     # yes i only wrote this to look like the profilmonline colormap since i think it looks cool
     image = cv2.imread(r"Profilometry\Colormap.png")
