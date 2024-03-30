@@ -27,7 +27,21 @@ def open_file():
     if not plt.fignum_exists(1):
         file_path = filedialog.askopenfilename(filetypes=[("OPDX files", "*.opdx")])
         if file_path:
-            process_file(file_path)
+            ftnum=16
+            is_empty = not ftnumt.get()
+            if not is_empty:
+                try:
+                    ftnum = int(ftnumt.get())
+                except:
+                    pass
+            is_empty = not startnum.get()
+            if not is_empty:
+                try:
+                    process_file(file_path, int(startnum.get()), ftnum)
+                except:
+                    process_file(file_path,0,ftnum)
+            else:
+                process_file(file_path,0,ftnum)
     else:
         print("Close current plot before opening a new one!")
 
@@ -42,7 +56,7 @@ def read_opdx(file_path):
     metadata = loader.get_metadata()
     return y, x, z.T, metadata # x and y swapped because of the TRANSPOSE
 
-def process_file(file_path):
+def process_file(file_path,num=0,ftnum=16):
 
     def format_coord(x,y):
         # properly print some coordinates and other useful info
@@ -103,7 +117,7 @@ def process_file(file_path):
 
     ax.format_coord=format_coord
 
-    dr = dragrectangle.DragRectangle(ax, x_values, y_values, data, path)
+    dr = dragrectangle.DragRectangle(ax, x_values, y_values, data, path, num, ftnum)
     dr.connect()
 
     # open plot
@@ -113,6 +127,14 @@ def process_file(file_path):
 
 root = tk.Tk()
 root.title("OPDX File Processor")
+
+startnum = tk.Entry(root)
+startnum.insert(0, "last number recorded")
+startnum.pack()
+
+ftnumt= tk.Entry(root)
+ftnumt.insert(0, "# of features")
+ftnumt.pack()
 
 file_path_label = tk.Button(root, text="Open Excel File", command=open_file2)
 file_path_label.pack()

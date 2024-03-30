@@ -3,7 +3,6 @@ from matplotlib.patches import Rectangle
 import numpy as np
 import math
 import pandas as pd
-num=0
 
 def update_excel_with_data(data_measurements, file_path, num):
     print(data_measurements, num)
@@ -20,7 +19,7 @@ def update_excel_with_data(data_measurements, file_path, num):
             startrow = 0
 
         # Determine if a new blank row should be inserted
-        if (num-1) % 16 == 0 and startrow != 0:
+        if (num-1) % ftnumber == 0 and startrow != 0:
             startrow += 1  # Increment startrow to insert data after the new blank row
 
         # Determine if headers need to be written
@@ -88,8 +87,8 @@ def plot_2d_slice(height_values, max_val, excel_path):
         plt.draw()
 
     def on_click(event):
-        global num
-        num=num+1
+        global number
+        number=number+1
         if not event.inaxes:
             return
         nonlocal bottom_val
@@ -97,9 +96,9 @@ def plot_2d_slice(height_values, max_val, excel_path):
 
         difference = max_val - bottom_val
 
-        data_measurements = [(num, max_val, bottom_val, difference)]
+        data_measurements = [(number, max_val, bottom_val, difference)]
 
-        update_excel_with_data(data_measurements, excel_path, num)
+        update_excel_with_data(data_measurements, excel_path, number)
 
         plt.close()
 
@@ -111,12 +110,18 @@ def plot_2d_slice(height_values, max_val, excel_path):
 
 
 class DragRectangle:
-    def __init__(self, ax, x_values, y_values, data, path):
+
+    def __init__(self, ax, x_values, y_values, data, path, num, ftnum):
+        global number, ftnumber
         self.ax = ax
         self.x_values = x_values
         self.y_values = y_values
         self.data = data
         self.path = path
+        self.num = num
+        number=num
+        self.ftnum=ftnum
+        ftnumber=ftnum
         self.rect = Rectangle((0, 0), 0, 0, linewidth=1, edgecolor='r', facecolor='none')
         self.is_dragging = False
         self.press_event = None
@@ -143,9 +148,8 @@ class DragRectangle:
         self.is_dragging = True
 
     def on_right_click(self, event):
-        global num
-        num=num+1
-        data_measurements = [(num, "N/A", "N/A")]
+        self.num=self.num+1
+        data_measurements = [(self.num, "N/A", "N/A")]
 
         update_excel_with_data(data_measurements, self.path)
 
@@ -190,8 +194,6 @@ class DragRectangle:
         self.findImportantValues()
 
     def findImportantValues(self):
-        global num
-
         if not self.selected_indices:
             return np.nan, np.nan  # Return NaN values if selected_indices is empty
 
