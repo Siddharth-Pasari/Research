@@ -19,23 +19,23 @@ data_y = 100 # found on ASC file
 y_uM = 3051 # found on profilmonline'''
 
 def level(heightmap):
-    # Calculate the slope on the x-axis using the average heights of the left and right columns
-    left_column_avg = np.mean(heightmap[:, 0])
-    right_column_avg = np.mean(heightmap[:, -1])
-    x_slope = (right_column_avg - left_column_avg) / heightmap.shape[1]
+    # Calculate the slope on the x-axis using the lower height of the left and right columns
+    left_column_min = np.min(heightmap[:, 0])
+    right_column_min = np.min(heightmap[:, -1])
+    x_slope = (right_column_min - left_column_min) / heightmap.shape[1]
 
     # Divide each column by the x-axis slope
     for col_index in range(heightmap.shape[1]):
-        heightmap[:, col_index] /= (left_column_avg + col_index * x_slope)
+        heightmap[:, col_index] -= left_column_min + col_index * x_slope
 
-    # Calculate the slope on the y-axis using the average heights of the top and bottom rows
-    top_row_avg = np.mean(heightmap[0, :])
-    bottom_row_avg = np.mean(heightmap[-1, :])
-    y_slope = (bottom_row_avg - top_row_avg) / heightmap.shape[0]
+    # Calculate the slope on the y-axis using the lower height of the top and bottom rows
+    top_row_min = np.min(heightmap[0, :])
+    bottom_row_min = np.min(heightmap[-1, :])
+    y_slope = (bottom_row_min - top_row_min) / heightmap.shape[0]
 
     # Divide each row by the y-axis slope
     for row_index in range(heightmap.shape[0]):
-        heightmap[row_index, :] /= (top_row_avg + row_index * y_slope)
+        heightmap[row_index, :] -= top_row_min + row_index * y_slope
 
     return heightmap
     
