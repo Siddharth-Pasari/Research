@@ -83,6 +83,10 @@ def process_file(file_path,num=0,ftnum=16):
 
     # opdx file
     x, y, data_raw, metadata = read_opdx(file_path)
+
+    if level_var.get() == 1:
+        data = level(data)
+
     minimum = data_raw.min()
     data = ((data_raw - minimum) * 1e6) # now in microns instead of meters
     data_y, data_x = data_raw.shape
@@ -91,9 +95,6 @@ def process_file(file_path,num=0,ftnum=16):
     y_uM = y.max()
 
     aspect_ratio = (data_y/data_x) * (y_uM/x_uM)
-
-    if level_var.get() == 1:
-        data = level(data)
 
     data_transpose = data.T
 
@@ -174,7 +175,7 @@ btn_open1.pack()
 btn_open = tk.Button(root, text="Exit Program", command=exit)
 btn_open.pack()
 
-info = tk.Label(root, text = "\n1. Open an excel file to log data to using the button\n\n2. Choose the OPDX file given to you by the DektakXT profilometer to plot\n\n3. Drag a rectangle around a feature, and then click the feature's bottom\n value as seen on the 2d graph. This will log both the top, bottom\nand net height of the feature to the provided excel sheet\n(see documentation video)\n\n4. To log an 'N/A' value to the provided excel sheet, right click")
+info = tk.Label(root, text = "\n1. Open an excel file to log data to using the button\n\n2. Choose the OPDX file given to you by the DektakXT profilometer to plot\n\n3. Drag a rectangle around a feature, and then click the feature's bottom\n value as seen on the 2d graph. This will log both the top, bottom\nand net height of the feature to the provided excel sheet\n(see documentation video)\n\n4. To log an 'N/A' value to the provided excel sheet, right click the heatmap\n\n5. To delete a value set, middle click the heatmap")
 info.pack()
 
 # Start the Tkinter event loop
