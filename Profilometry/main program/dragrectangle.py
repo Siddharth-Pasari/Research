@@ -154,10 +154,11 @@ class DragRectangle:
         self.is_dragging = True
 
     def on_right_click(self, event):
-        self.num=self.num+1
-        data_measurements = [(self.num, "N/A", "N/A")]
+        global number
+        number=number+1
+        data_measurements = [(self.num, "N/A", "N/A", "N/A")]
 
-        update_excel_with_data(data_measurements, self.path)
+        update_excel_with_data(data_measurements, self.path, number)
 
     def on_motion(self, event):
         if not self.is_dragging or event.inaxes != self.ax:
