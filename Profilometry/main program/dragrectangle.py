@@ -145,6 +145,10 @@ class DragRectangle:
         if event.button == 3:  # Right-click event
             self.on_right_click(event)
             return
+        
+        if event.button == 2:
+            self.on_middle_click(event)
+            return
 
         self.press_event = event
         self.rect.set_width(0)
@@ -156,9 +160,29 @@ class DragRectangle:
     def on_right_click(self, event):
         global number
         number=number+1
-        data_measurements = [(self.num, "N/A", "N/A", "N/A")]
+        data_measurements = [(number, "N/A", "N/A", "N/A")]
 
         update_excel_with_data(data_measurements, self.path, number)
+
+    def on_middle_click(self, event):
+        global number
+        number=number-1
+        # Load the workbook and the active worksheet
+        file_path = self.path
+        workbook = openpyxl.load_workbook(file_path)
+        sheet = workbook.active
+
+        # Find the last row with data in the Excel sheet
+        df = pd.read_excel(file_path)
+        last_row_index = df.last_valid_index()
+
+        # If there is at least one row, delete the last one
+        if last_row_index is not None:
+            sheet.delete_rows(last_row_index + 2)  # +2 because DataFrame index is 0-based and Excel row numbers are 1-based; add 1 more to move past the header
+
+        # Save the modified workbook
+        print("deleted")
+        workbook.save(file_path)
 
     def on_motion(self, event):
         if not self.is_dragging or event.inaxes != self.ax:
