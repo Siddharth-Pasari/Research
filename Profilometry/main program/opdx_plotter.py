@@ -174,7 +174,7 @@ btn_open1.pack()
 btn_open = tk.Button(root, text="Exit Program", command=exit)
 btn_open.pack()
 
-info = tk.Label(root, text = "\n1. Open an excel file to log data to using the button\n\n2. Choose the OPDX file given to you by the DektakXT profilometer to plot\n\n3. Drag a rectangle around a feature, and then click the feature's bottom\n value as seen on the 2d graph. This will log both the top, bottom\nand net height of the feature to the provided excel sheet\n(see documentation video)\n\n4. To log an 'N/A' value to the provided excel sheet, right click")
+info = tk.Label(root, text = "\n1. Open an excel file to log data to using the button\n\n2. Choose the OPDX file given to you by the DektakXT profilometer to plot\n\n3. Drag a rectangle around a feature, and then click the feature's bottom\n value as seen on the 2d graph. This will log both the top, bottom\nand net height of the feature to the provided excel sheet\n(see documentation video)\n\n4. To log an 'N/A' value to the provided excel sheet, right click the heatmap\n\n5. To delete a value set, middle click the heatmap")
 info.pack()
 
 # Start the Tkinter event loop
