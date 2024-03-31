@@ -117,7 +117,7 @@ def process_file(file_path,num=0,ftnum=16):
 
     ax.format_coord=format_coord
 
-    dr = dragrectangle.DragRectangle(ax, x_values, y_values, data, path, num, ftnum)
+    dr = dragrectangle.DragRectangle(ax, x_values, y_values, data, path, num, ftnum, str(titlet.get()))
     dr.connect()
 
     # open plot
@@ -129,12 +129,16 @@ root = tk.Tk()
 root.title("OPDX File Processor")
 
 startnum = tk.Entry(root)
-startnum.insert(0, "last number recorded")
+startnum.insert(0, "last number recorded (0)")
 startnum.pack()
 
 ftnumt= tk.Entry(root)
-ftnumt.insert(0, "# of features")
+ftnumt.insert(0, "# of features (16)")
 ftnumt.pack()
+
+titlet= tk.Entry(root)
+titlet.insert(0, "name of file (only if starting new)")
+titlet.pack()
 
 file_path_label = tk.Button(root, text="Open Excel File", command=open_file2)
 file_path_label.pack()

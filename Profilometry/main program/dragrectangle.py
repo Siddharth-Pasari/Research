@@ -3,34 +3,39 @@ from matplotlib.patches import Rectangle
 import numpy as np
 import math
 import pandas as pd
+import openpyxl
+from openpyxl.styles import Font
 
+title="TITLE"
 def update_excel_with_data(data_measurements, file_path, num):
     print(data_measurements, num)
 
     # Create a DataFrame with specified column names
     df = pd.DataFrame(data_measurements, columns=['Num', 'Top', 'Bottom', 'Difference'])
 
-    # Open the Excel file and append the DataFrame
     with pd.ExcelWriter(file_path, mode='a', engine='openpyxl', if_sheet_exists='overlay') as writer:
-        # Get the last row with data in the existing sheet
         try:
             startrow = writer.sheets['Sheet1'].max_row
         except KeyError:
             startrow = 0
 
-        # Determine if a new blank row should be inserted
-        if (num-1) % ftnumber == 0 and startrow != 0:
-            startrow += 1  # Increment startrow to insert data after the new blank row
+        if (num-1) % ftnumber == 0 and startrow != 0:  # Assuming ftnumber is defined somewhere else
+            startrow += 1
 
-        # Determine if headers need to be written
         if num == 1:
+            # Write the title above the headers if this is the first set of measurements
+            ws = writer.sheets['Sheet1']    
+            ws.insert_rows(startrow, amount=1)  # Insert a blank row above the title
+            ws.cell(row=startrow+1, column=1, value=title).font = Font(bold=True)  # Write the title and make it bold
             headers = ['Num', 'Top', 'Bottom', 'Difference']
+            # Increment startrow so headers will be below the title
+            startrow += 1
+
         else:
             headers = False
-
-        # Preserve any existing data in the file by using startrow accordingly
+        
+        # Write the DataFrame to the sheet at the updated starting row
         df.to_excel(writer, sheet_name='Sheet1', startrow=startrow, index=False, header=headers)
-
 
 def plot_2d_slice(height_values, max_val, excel_path):
     
@@ -111,8 +116,8 @@ def plot_2d_slice(height_values, max_val, excel_path):
 
 class DragRectangle:
 
-    def __init__(self, ax, x_values, y_values, data, path, num, ftnum):
-        global number, ftnumber
+    def __init__(self, ax, x_values, y_values, data, path, num, ftnum, titlet):
+        global number, ftnumber, title
         self.ax = ax
         self.x_values = x_values
         self.y_values = y_values
@@ -122,6 +127,7 @@ class DragRectangle:
         number=num
         self.ftnum=ftnum
         ftnumber=ftnum
+        title=titlet
         self.rect = Rectangle((0, 0), 0, 0, linewidth=1, edgecolor='r', facecolor='none')
         self.is_dragging = False
         self.press_event = None
