@@ -83,6 +83,10 @@ def process_file(file_path,num=0,ftnum=16):
 
     # opdx file
     x, y, data_raw, metadata = read_opdx(file_path)
+
+    if level_var.get() == 1:
+        data = level(data)
+
     minimum = data_raw.min()
     data = ((data_raw - minimum) * 1e6) # now in microns instead of meters
     data_y, data_x = data_raw.shape
@@ -91,9 +95,6 @@ def process_file(file_path,num=0,ftnum=16):
     y_uM = y.max()
 
     aspect_ratio = (data_y/data_x) * (y_uM/x_uM)
-
-    if level_var.get() == 1:
-        data = level(data)
 
     data_transpose = data.T
 
