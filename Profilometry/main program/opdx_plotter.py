@@ -91,7 +91,10 @@ def process_file(file_path,num=0,ftnum=16):
     y_uM = y.max()
 
     aspect_ratio = (data_y/data_x) * (y_uM/x_uM)
-    data = level(data)
+
+    if level_var.get() == 1:
+        data = level(data)
+
     data_transpose = data.T
 
     # yes i only wrote this to look like the profilmonline colormap since i think it looks cool
@@ -157,11 +160,16 @@ titlet= tk.Entry(root)
 titlet.insert(0, "name of file (only if starting new)")
 titlet.pack()
 
+level_var = tk.IntVar()
+
+level_check = tk.Checkbutton(root, text="Levelling", variable=level_var, onvalue=1, offvalue=0)
+level_check.pack()
+
 file_path_label = tk.Button(root, text="Open Excel File", command=open_file2)
 file_path_label.pack()
 
-btn_open = tk.Button(root, text="Open OPDX File", command=open_file)
-btn_open.pack()
+btn_open1 = tk.Button(root, text="Open OPDX File", command=open_file)
+btn_open1.pack()
 
 btn_open = tk.Button(root, text="Exit Program", command=exit)
 btn_open.pack()
@@ -172,5 +180,4 @@ info.pack()
 # Start the Tkinter event loop
 root.mainloop()
 
-root.mainloop()
 print("Closing application...")
