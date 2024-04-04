@@ -18,24 +18,47 @@ x_uM = 3960 # found on profilmonline
 data_y = 100 # found on ASC file
 y_uM = 3051 # found on profilmonline'''
 
-def level(list):
-    # calculates slope
-    first_point = list[-1][0]
-    last_point = list[-1][-1]
-    print(first_point, last_point)
-    slope = (last_point - first_point) / len(list)
+def level(heightmap):
+    # Calculate the slope on the x-axis using the lower height of the left and right columns
+    left_column_min = np.min(heightmap[:, 0])
+    right_column_min = np.min(heightmap[:, -1])
+    x_slope = (right_column_min - left_column_min) / heightmap.shape[1]
 
-    # Divide all rows by the slope
-    leveled_table = [[value / slope for value in row] for row in list]
+    # Divide each column by the x-axis slope
+    for col_index in range(heightmap.shape[1]):
+        heightmap[:, col_index] -= left_column_min + col_index * x_slope
 
-    return leveled_table
+    # Calculate the slope on the y-axis using the lower height of the top and bottom rows
+    top_row_min = np.min(heightmap[0, :])
+    bottom_row_min = np.min(heightmap[-1, :])
+    y_slope = (bottom_row_min - top_row_min) / heightmap.shape[0]
+
+    # Divide each row by the y-axis slope
+    for row_index in range(heightmap.shape[0]):
+        heightmap[row_index, :] -= top_row_min + row_index * y_slope
+
+    return heightmap
     
 def open_file():
     global file_path
     if not plt.fignum_exists(1):
         file_path = filedialog.askopenfilename(filetypes=[("OPDX files", "*.opdx")])
         if file_path:
-            process_file(file_path)
+            ftnum=16
+            is_empty = not ftnumt.get()
+            if not is_empty:
+                try:
+                    ftnum = int(ftnumt.get())
+                except:
+                    pass
+            is_empty = not startnum.get()
+            if not is_empty:
+                try:
+                    process_file(file_path, int(startnum.get()), ftnum)
+                except:
+                    process_file(file_path,0,ftnum)
+            else:
+                process_file(file_path,0,ftnum)
     else:
         print("Close current plot before opening a new one!")
 
@@ -50,7 +73,7 @@ def read_opdx(file_path):
     metadata = loader.get_metadata()
     return y, x, z.T, metadata # x and y swapped because of the TRANSPOSE
 
-def process_file(file_path):
+def process_file(file_path,num=0,ftnum=16):
 
     def format_coord(x,y):
         # properly print some coordinates and other useful info
@@ -60,6 +83,10 @@ def process_file(file_path):
 
     # opdx file
     x, y, data_raw, metadata = read_opdx(file_path)
+
+    if level_var.get() == 1:
+        data = level(data)
+
     minimum = data_raw.min()
     data = ((data_raw - minimum) * 1e6) # now in microns instead of meters
     data_y, data_x = data_raw.shape
@@ -68,6 +95,7 @@ def process_file(file_path):
     y_uM = y.max()
 
     aspect_ratio = (data_y/data_x) * (y_uM/x_uM)
+
     data_transpose = data.T
 
     # yes i only wrote this to look like the profilmonline colormap since i think it looks cool
@@ -110,7 +138,7 @@ def process_file(file_path):
 
     ax.format_coord=format_coord
 
-    dr = dragrectangle.DragRectangle(ax, x_values, y_values, data, path)
+    dr = dragrectangle.DragRectangle(ax, x_values, y_values, data, path, num, ftnum, str(titlet.get()))
     dr.connect()
 
     # open plot
@@ -121,17 +149,36 @@ def process_file(file_path):
 root = tk.Tk()
 root.title("OPDX File Processor")
 
+startnum = tk.Entry(root)
+startnum.insert(0, "last number recorded (0)")
+startnum.pack()
+
+ftnumt= tk.Entry(root)
+ftnumt.insert(0, "# of features (16)")
+ftnumt.pack()
+
+titlet= tk.Entry(root)
+titlet.insert(0, "name of file (only if starting new)")
+titlet.pack()
+
+level_var = tk.IntVar()
+
+level_check = tk.Checkbutton(root, text="Levelling", variable=level_var, onvalue=1, offvalue=0)
+level_check.pack()
+
 file_path_label = tk.Button(root, text="Open Excel File", command=open_file2)
 file_path_label.pack()
 
-btn_open = tk.Button(root, text="Open OPDX file", command=open_file)
+btn_open1 = tk.Button(root, text="Open OPDX File", command=open_file)
+btn_open1.pack()
+
+btn_open = tk.Button(root, text="Exit Program", command=exit)
 btn_open.pack()
 
-info = tk.Label(root, text = "Choose an excel file and then open an opdx file\nto plot it and gather data by dragging a rectangle.\nTo return N/A values, right click on the 3D PLOT\nand not the 2d graph.")
+info = tk.Label(root, text = "\n1. Open an excel file to log data to using the button\n\n2. Choose the OPDX file given to you by the DektakXT profilometer to plot\n\n3. Drag a rectangle around a feature, and then click the feature's bottom\n value as seen on the 2d graph. This will log both the top, bottom\nand net height of the feature to the provided excel sheet\n(see documentation video)\n\n4. To log an 'N/A' value to the provided excel sheet, right click the heatmap\n\n5. To delete a value set, middle click the heatmap")
 info.pack()
 
 # Start the Tkinter event loop
 root.mainloop()
 
-root.mainloop()
 print("Closing application...")

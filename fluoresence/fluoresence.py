@@ -10,35 +10,33 @@ box_x = 0
 box_y = 0
 step = 1
 
-def update_excel_with_data(data_measurements, file_path):
-    """
-    Inserts a list of data measurements into an Excel sheet.
+def update_excel_with_data(data_measurements, file_path, num):
+    print(data_measurements, num)
 
-    Parameters:
-    - data_measurements: A list of tuples containing (area, mean, std_dev, min_val, max_val)
-    - file_path: Path to the Excel file where the data is to be inserted
-    """
-
-    # Convert the list of tuples to a pandas DataFrame
+    # Create a DataFrame with specified column names
     df = pd.DataFrame(data_measurements, columns=['Num', 'Area', 'Mean', 'StdDev', 'Min', 'Max'])
 
     # Open the Excel file and append the DataFrame
     with pd.ExcelWriter(file_path, mode='a', engine='openpyxl', if_sheet_exists='overlay') as writer:
         # Get the last row with data in the existing sheet
-        # If the file or sheet does not exist yet, it will start from the beginning
         try:
             startrow = writer.sheets['Sheet1'].max_row
         except KeyError:
             startrow = 0
 
-        # If starting on a new sheet, write headers, otherwise skip them
-        if startrow == 0:
-            headers = True
+        # Determine if a new blank row should be inserted
+        if (num-1) % 16 == 0 and startrow != 0:
+            startrow += 1  # Increment startrow to insert data after the new blank row
+
+        # Determine if headers need to be written
+        if num == 1:
+            headers = ['Num', 'Area', 'Mean', 'StdDev', 'Min', 'Max']
         else:
             headers = False
 
-        # Write the DataFrame to the Excel file
+        # Preserve any existing data in the file by using startrow accordingly
         df.to_excel(writer, sheet_name='Sheet1', startrow=startrow, index=False, header=headers)
+
 
 def convert_to_grayscale(image):
     # Ensure image is in RGB mode
@@ -111,21 +109,13 @@ def print_coords1(event):
 
     num += 1
 
-    # Print the results
-    print("Num:", num)
-    print("Area:", area)
-    print("Mean:", mean)
-    print("Standard Deviation:", std_dev)
-    print("Minimum Value:", min_val)
-    print("Maximum Value:", max_val)
-
     # List of data points (area, mean, std_dev, min_val, max_val)
     data_measurements = [(num, area, mean, std_dev, min_val, max_val)]
 
-    update_excel_with_data(data_measurements, excel_path)
+    update_excel_with_data(data_measurements, excel_path, num)
 
 def move_box(event):
-    global box_x, box_y
+    global box_x, box_y, square
     if event.keysym == 'Left':
         box_x -= step
     elif event.keysym == 'Right':
@@ -150,7 +140,6 @@ def print_coords(event):
     if square:
         canvas.delete(square)  # Delete previous square
     square = canvas.create_rectangle(x0, y0, x1, y1, outline='#FFFF00', fill='')  # Draw new square
-    print(f'X: {box_x}, Y: {box_y}')  # Print coordinates
 
 root = tk.Tk()
 root.title('Image Viewer')

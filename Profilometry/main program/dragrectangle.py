@@ -3,39 +3,42 @@ from matplotlib.patches import Rectangle
 import numpy as np
 import math
 import pandas as pd
-num=0
+import openpyxl
+from openpyxl.styles import Font
 
-def update_excel_with_data(data_measurements, file_path):
-    """
-    Inserts a list of data measurements into an Excel sheet.
+title="TITLE"
+def update_excel_with_data(data_measurements, file_path, num):
+    print(data_measurements, num)
 
-    Parameters:
-    - data_measurements: A list of tuples containing (area, mean, std_dev, min_val, max_val)
-    - file_path: Path to the Excel file where the data is to be inserted
-    """
+    # Create a DataFrame with specified column names
+    df = pd.DataFrame(data_measurements, columns=['Num', 'Top', 'Bottom', 'Difference'])
 
-    # Convert the list of tuples to a pandas DataFrame
-    df = pd.DataFrame(data_measurements, columns=['Num','Top','Bottom'])
-    
-    # Open the Excel file and append the DataFrame
     with pd.ExcelWriter(file_path, mode='a', engine='openpyxl', if_sheet_exists='overlay') as writer:
-        # Get the last row with data in the existing sheet
-        # If the file or sheet does not exist yet, it will start from the beginning
         try:
             startrow = writer.sheets['Sheet1'].max_row
         except KeyError:
             startrow = 0
-        
-        # If starting on a new sheet, write headers, otherwise skip them
-        if startrow == 0:
-            headers = True
+
+        if (num-1) % ftnumber == 0 and startrow != 0:  # Assuming ftnumber is defined somewhere else
+            startrow += 1
+
+        if num == 1:
+            # Write the title above the headers if this is the first set of measurements
+            ws = writer.sheets['Sheet1']    
+            ws.insert_rows(startrow, amount=1)  # Insert a blank row above the title
+            ws.cell(row=startrow+1, column=1, value=title).font = Font(bold=True)  # Write the title and make it bold
+            headers = ['Num', 'Top', 'Bottom', 'Difference']
+            # Increment startrow so headers will be below the title
+            startrow += 1
+
         else:
             headers = False
         
-        # Write the DataFrame to the Excel file
+        # Write the DataFrame to the sheet at the updated starting row
         df.to_excel(writer, sheet_name='Sheet1', startrow=startrow, index=False, header=headers)
 
 def plot_2d_slice(height_values, max_val, excel_path):
+    
     """
     Plots a 2D representation of a data slice given height values.
     A vertical line and the y coordinate of the line associated with the current x-coordinate
@@ -65,7 +68,7 @@ def plot_2d_slice(height_values, max_val, excel_path):
                                      bbox=dict(boxstyle="round4", fc="cyan", ec="black", lw=1))
 
     # Variable to hold the y-value
-    y_value = None
+    bottom_val = None
 
     def on_move(event):
         if not event.inaxes:
@@ -89,17 +92,18 @@ def plot_2d_slice(height_values, max_val, excel_path):
         plt.draw()
 
     def on_click(event):
-        global num
-        num=num+1
+        global number
+        number=number+1
         if not event.inaxes:
             return
-        nonlocal y_value
-        y_value = height_values[np.clip(np.searchsorted(x_values, event.xdata), 1, len(x_values) - 1) - 1]
-        print(f"Recorded y-value: {max_val, y_value}")
+        nonlocal bottom_val
+        bottom_val = height_values[np.clip(np.searchsorted(x_values, event.xdata), 1, len(x_values) - 1) - 1]
 
-        data_measurements = [(num, max_val, y_value)]
+        difference = max_val - bottom_val
 
-        update_excel_with_data(data_measurements, excel_path)
+        data_measurements = [(number, max_val, bottom_val, difference)]
+
+        update_excel_with_data(data_measurements, excel_path, number)
 
         plt.close()
 
@@ -111,12 +115,19 @@ def plot_2d_slice(height_values, max_val, excel_path):
 
 
 class DragRectangle:
-    def __init__(self, ax, x_values, y_values, data, path):
+
+    def __init__(self, ax, x_values, y_values, data, path, num, ftnum, titlet):
+        global number, ftnumber, title
         self.ax = ax
         self.x_values = x_values
         self.y_values = y_values
         self.data = data
         self.path = path
+        self.num = num
+        number=num
+        self.ftnum=ftnum
+        ftnumber=ftnum
+        title=titlet
         self.rect = Rectangle((0, 0), 0, 0, linewidth=1, edgecolor='r', facecolor='none')
         self.is_dragging = False
         self.press_event = None
@@ -134,6 +145,10 @@ class DragRectangle:
         if event.button == 3:  # Right-click event
             self.on_right_click(event)
             return
+        
+        if event.button == 2:
+            self.on_middle_click(event)
+            return
 
         self.press_event = event
         self.rect.set_width(0)
@@ -143,11 +158,31 @@ class DragRectangle:
         self.is_dragging = True
 
     def on_right_click(self, event):
-        global num
-        num=num+1
-        data_measurements = [(num, "N/A", "N/A")]
+        global number
+        number=number+1
+        data_measurements = [(number, "N/A", "N/A", "N/A")]
 
-        update_excel_with_data(data_measurements, self.path)
+        update_excel_with_data(data_measurements, self.path, number)
+
+    def on_middle_click(self, event):
+        global number
+        number=number-1
+        # Load the workbook and the active worksheet
+        file_path = self.path
+        workbook = openpyxl.load_workbook(file_path)
+        sheet = workbook.active
+
+        # Find the last row with data in the Excel sheet
+        df = pd.read_excel(file_path)
+        last_row_index = df.last_valid_index()
+
+        # If there is at least one row, delete the last one
+        if last_row_index is not None:
+            sheet.delete_rows(last_row_index + 2)  # +2 because DataFrame index is 0-based and Excel row numbers are 1-based; add 1 more to move past the header
+
+        # Save the modified workbook
+        print("deleted")
+        workbook.save(file_path)
 
     def on_motion(self, event):
         if not self.is_dragging or event.inaxes != self.ax:
@@ -190,8 +225,6 @@ class DragRectangle:
         self.findImportantValues()
 
     def findImportantValues(self):
-        global num
-
         if not self.selected_indices:
             return np.nan, np.nan  # Return NaN values if selected_indices is empty
 
