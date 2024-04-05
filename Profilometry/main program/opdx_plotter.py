@@ -85,7 +85,7 @@ def process_file(file_path,num=0,ftnum=16):
     x, y, data_raw, metadata = read_opdx(file_path)
 
     if level_var.get() == 1:
-        data_raw = level(data_raw)
+        data = level(data)
 
     minimum = data_raw.min()
     data = ((data_raw - minimum) * 1e6) # now in microns instead of meters
