@@ -4,11 +4,13 @@ import tkinter as tk
 from tkinter import filedialog
 from PIL import Image, ImageTk
 import openpyxl
-
+from openpyxl.styles import Font
 num = 0
 box_x = 0
 box_y = 0
 step = 1
+title = ""
+ftnum=16
 
 def update_excel_with_data(data_measurements, file_path, num):
     print(data_measurements, num)
@@ -16,27 +18,29 @@ def update_excel_with_data(data_measurements, file_path, num):
     # Create a DataFrame with specified column names
     df = pd.DataFrame(data_measurements, columns=['Num', 'Area', 'Mean', 'StdDev', 'Min', 'Max'])
 
-    # Open the Excel file and append the DataFrame
     with pd.ExcelWriter(file_path, mode='a', engine='openpyxl', if_sheet_exists='overlay') as writer:
-        # Get the last row with data in the existing sheet
         try:
             startrow = writer.sheets['Sheet1'].max_row
         except KeyError:
             startrow = 0
 
-        # Determine if a new blank row should be inserted
-        if (num-1) % 16 == 0 and startrow != 0:
-            startrow += 1  # Increment startrow to insert data after the new blank row
+        if (num-1) % ftnum == 0 and startrow != 0:  # Assuming ftnumber is defined somewhere else
+            startrow += 1
 
-        # Determine if headers need to be written
         if num == 1:
+            # Write the title above the headers if this is the first set of measurements
+            ws = writer.sheets['Sheet1']    
+            ws.insert_rows(startrow, amount=1)  # Insert a blank row above the title
+            ws.cell(row=startrow+1, column=1, value=title).font = Font(bold=True)  # Write the title and make it bold
             headers = ['Num', 'Area', 'Mean', 'StdDev', 'Min', 'Max']
+            # Increment startrow so headers will be below the title
+            startrow += 1
+
         else:
             headers = False
-
-        # Preserve any existing data in the file by using startrow accordingly
+        
+        # Write the DataFrame to the sheet at the updated starting row
         df.to_excel(writer, sheet_name='Sheet1', startrow=startrow, index=False, header=headers)
-
 
 def convert_to_grayscale(image):
     # Ensure image is in RGB mode
@@ -78,10 +82,27 @@ def analyze_square(image, x, y):
     return area, mean, std_dev, min_val, max_val
 
 def get_file_path():
-    global file_path
+    global file_path, ftnum, num, title
     file_path = filedialog.askopenfilename(initialdir="/", title="Select file",
                                            filetypes=(("jpeg files", "*.jpg"), ("all files", "*.*")))
     if file_path:  # Check if a file was selected
+        ftnum=16
+        is_empty = not ftnumt.get()
+        if not is_empty:
+            try:
+                ftnum = int(ftnumt.get())
+            except:
+                pass
+        is_empty = not startnum.get()
+        if not is_empty:
+            try:
+                num = int(startnum.get())
+            except:
+                num=0
+        else:
+            num=0
+        title = str(titlet.get())
+
         display_image(file_path)
 
 def get_file_path2():
@@ -128,7 +149,10 @@ def move_box(event):
     half_height = 47 / 2
     x0, y0 = box_x - half_width, box_y - half_height
     x1, y1 = box_x + half_width, box_y + half_height
-    canvas.coords(square, x0, y0, x1, y1)
+    try:
+        canvas.coords(square, x0, y0, x1, y1)
+    except:
+        pass
 
 def print_coords(event):
     global square, canvas, file_path, box_x, box_y
@@ -144,14 +168,35 @@ def print_coords(event):
 root = tk.Tk()
 root.title('Image Viewer')
 
-btn_load = tk.Button(root, text="Load Image", command=get_file_path)
-btn_load.pack()
-
-btn_load = tk.Button(root, text="Load excel", command=get_file_path2)
-btn_load.pack()
-
-canvas = tk.Canvas(root, width=1920, height=1080)  # You might want to adjust the size to fit your image properly
+canvas = tk.Canvas(root, width=3840, height=2060)  # You might want to adjust the size to fit your image properly
 canvas.pack()
+
+window=tk.Toplevel()
+window.title('Info')
+window.geometry('300x400')
+
+startnum = tk.Entry(window)
+startnum.insert(0, "last number recorded (0)")
+startnum.pack()
+
+ftnumt= tk.Entry(window)
+ftnumt.insert(0, "# of features (16)")
+ftnumt.pack()
+
+titlet= tk.Entry(window)
+titlet.insert(0, "name of file (only if starting new)")
+titlet.pack()
+
+level_var = tk.IntVar()
+
+file_path_label = tk.Button(window, text="Open Excel File", command=get_file_path2)
+file_path_label.pack()
+
+btn_open1 = tk.Button(window, text="Open Image  File", command=get_file_path)
+btn_open1.pack()
+
+btn_open = tk.Button(window, text="Exit Program", command=exit)
+btn_open.pack()
 
 canvas.bind("<Button-1>", print_coords)  # Bind the button click to the canvas, not a label
 
