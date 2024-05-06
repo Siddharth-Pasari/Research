@@ -119,21 +119,38 @@ def display_image(file_path):
 
 def print_coords1(event):
     global num
+
+    half_width = 52 / 2
+    half_height = 47 / 2
     # Open the image
     pil_image = Image.open(file_path)
 
     # Convert the image to grayscale
     grayscale_image = convert_to_grayscale(pil_image)
-
-    # Analyze the grayscale square region
-    area, mean, std_dev, min_val, max_val = analyze_square(grayscale_image, box_x, box_y)
-
     num += 1
+
+    maxmean=0
+    maxboxx=None
+    maxboxy=None
+
+    for i in range(round(box_x - half_width),round(box_x + half_width+1)):
+        for j in range(round(box_y - half_height),round(box_y + half_height+1)):
+            area, mean, std_dev, min_val, max_val = analyze_square(grayscale_image, i, j)
+            if mean>maxmean:
+                print(mean)
+                maxmean=mean
+                maxboxx=i
+                maxboxy=j
+    # Analyze the grayscale square region
+    area, mean, std_dev, min_val, max_val = analyze_square(grayscale_image, maxboxx, maxboxy)
+
 
     # List of data points (area, mean, std_dev, min_val, max_val)
     data_measurements = [(num, area, mean, std_dev, min_val, max_val)]
 
-    update_excel_with_data(data_measurements, excel_path, num)
+    print(data_measurements)
+
+    #update_excel_with_data(data_measurements, excel_path, num)
 
 def move_box(event):
     global box_x, box_y, square
@@ -161,6 +178,7 @@ def print_coords(event):
     half_height = 47 / 2
     x0, y0 = box_x - half_width, box_y - half_height
     x1, y1 = box_x + half_width, box_y + half_height
+    print(box_x, box_y)
     if square:
         canvas.delete(square)  # Delete previous square
     square = canvas.create_rectangle(x0, y0, x1, y1, outline='#FFFF00', fill='')  # Draw new square
@@ -204,6 +222,8 @@ canvas.bind("<Button-3>", print_coords1)  # Bind the button click to the canvas,
 
 canvas.focus_set()  # Set focus to the canvas so it can receive key events
 canvas.bind("<Key>", move_box)  #
+
+
 
 
 square = None  # Variable to hold square object
