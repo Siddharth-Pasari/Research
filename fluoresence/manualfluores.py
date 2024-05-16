@@ -117,76 +117,23 @@ def display_image(file_path):
     canvas.create_image(0, 0, anchor='nw', image=tk_img)  # Display the image on the canvas
     canvas.config(scrollregion=canvas.bbox(tk.ALL))  # Update the scroll region to encompass the image
 
-def print_coords(event):
-    global square, canvas, file_path, box_x, box_y
-    box_x, box_y = event.x, event.y
-    half_width = 52 / 2
-    half_height = 47 / 2
-    x0, y0 = box_x - half_width, box_y - half_height
-    x1, y1 = box_x + half_width, box_y + half_height
-    print(box_x, box_y)
-    if square:
-        canvas.delete(square)  # Delete previous square
-    square = canvas.create_rectangle(x0, y0, x1, y1, outline='#FFFF00', fill='')  # Draw new square
-
 def print_coords1(event):
-    global num, box_x, box_y
-
-    half_width = 52 / 2
-    half_height = 47 / 2
+    global num
     # Open the image
     pil_image = Image.open(file_path)
 
     # Convert the image to grayscale
     grayscale_image = convert_to_grayscale(pil_image)
+
+    # Analyze the grayscale square region
+    area, mean, std_dev, min_val, max_val = analyze_square(grayscale_image, box_x, box_y)
+
     num += 1
 
-    boxxorigin = box_x
+    # List of data points (area, mean, std_dev, min_val, max_val)
+    data_measurements = [(num, area, mean, std_dev, min_val, max_val)]
 
-    boxyorigin = box_y
-
-    datalist=[]
-
-    for ftnumber in range(1, 4*ftnum+1):
-        
-        maxmean=0
-        maxboxx=None
-        maxboxy=None
-
-        for i in range(round(box_x - half_width),round(box_x + half_width+1)):
-            for j in range(round(box_y - half_height),round(box_y + half_height+1)):
-                area, mean, std_dev, min_val, max_val = analyze_square(grayscale_image, i, j)
-                if mean>maxmean:
-                    maxmean=mean
-                    maxboxx=i
-                    maxboxy=j
-
-        area, mean, std_dev, min_val, max_val = analyze_square(grayscale_image, maxboxx, maxboxy)
-
-        data_measurements = (ftnumber, area, mean, std_dev, min_val, max_val)
-
-        print(data_measurements)
-        
-        update_excel_with_data(data_measurements, excel_path, ftnumber)
-
-        datalist.append(data_measurements)
-
-        
-        if ftnumber==32:
-            box_y=boxyorigin
-            box_x=box_x+200
-        
-        elif ftnumber%ftnum==0:
-            box_x=box_x-435
-            box_y+=175
-
-        elif ftnumber%4==0:
-            box_x = box_x - 435
-            box_y = box_y + 110
-        else:
-            box_x=box_x+145
-
-    print(datalist)
+    update_excel_with_data(data_measurements, excel_path, num)
 
 def move_box(event):
     global box_x, box_y, square
@@ -207,7 +154,16 @@ def move_box(event):
     except:
         pass
 
-
+def print_coords(event):
+    global square, canvas, file_path, box_x, box_y
+    box_x, box_y = event.x, event.y
+    half_width = 52 / 2
+    half_height = 47 / 2
+    x0, y0 = box_x - half_width, box_y - half_height
+    x1, y1 = box_x + half_width, box_y + half_height
+    if square:
+        canvas.delete(square)  # Delete previous square
+    square = canvas.create_rectangle(x0, y0, x1, y1, outline='#FFFF00', fill='')  # Draw new square
 
 root = tk.Tk()
 root.title('Image Viewer')
@@ -248,8 +204,6 @@ canvas.bind("<Button-3>", print_coords1)  # Bind the button click to the canvas,
 
 canvas.focus_set()  # Set focus to the canvas so it can receive key events
 canvas.bind("<Key>", move_box)  #
-
-
 
 
 square = None  # Variable to hold square object
