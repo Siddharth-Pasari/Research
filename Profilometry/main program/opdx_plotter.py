@@ -98,6 +98,14 @@ def process_file(file_path,num=0,ftnum=16):
 
     data_transpose = data.T
 
+    tdata = data
+
+    if rotate_var.get() == 1:
+
+        data_transpose = np.rot90(data_transpose, 2)
+
+        tdata=np.rot90(data, 2)
+
     # yes i only wrote this to look like the profilmonline colormap since i think it looks cool
     image = cv2.imread(r"Profilometry\Colormap.png")
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -137,8 +145,9 @@ def process_file(file_path,num=0,ftnum=16):
     y_values = np.linspace(0, data_y, data_y + 1)
 
     ax.format_coord=format_coord
+    
 
-    dr = dragrectangle.DragRectangle(ax, x_values, y_values, data, path, num, ftnum, str(titlet.get()))
+    dr = dragrectangle.DragRectangle(ax, x_values, y_values, tdata, path, num, ftnum, str(titlet.get()))
     dr.connect()
 
     # open plot
@@ -165,6 +174,11 @@ level_var = tk.IntVar()
 
 level_check = tk.Checkbutton(root, text="Levelling", variable=level_var, onvalue=1, offvalue=0)
 level_check.pack()
+
+rotate_var = tk.IntVar()
+
+rotate_check = tk.Checkbutton(root, text="Rotate 180°", variable=rotate_var, onvalue=1, offvalue=0)
+rotate_check.pack()
 
 file_path_label = tk.Button(root, text="Open Excel File", command=open_file2)
 file_path_label.pack()
