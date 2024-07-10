@@ -11,13 +11,6 @@ from opdx_reader import DektakLoad
 
 print("-----------------------------------------------------------------------")
 
-'''# Set the size of the image to build the sheet more accurately and convert these weird numbers to actual height data
-height_uM = 9.899 # found on profilmonline
-data_x = 6001 # found on ASC file
-x_uM = 3960 # found on profilmonline
-data_y = 100 # found on ASC file
-y_uM = 3051 # found on profilmonline'''
-
 def level(heightmap):
     # Calculate the slope on the x-axis using the lower height of the left and right columns
     left_column_min = np.min(heightmap[:, 0])
