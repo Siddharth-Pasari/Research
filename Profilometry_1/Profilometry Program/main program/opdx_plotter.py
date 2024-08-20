@@ -100,7 +100,7 @@ def process_file(file_path,num=0,ftnum=16):
         tdata=np.rot90(data, 2)
 
     # yes i only wrote this to look like the profilmonline colormap since i think it looks cool
-    image = cv2.imread("Colormap.png")
+    image = cv2.imread(r"C:\Users\ASRCADMintern6\Documents\GitHub\Research\Profilometry_1\Profilometry Program\main program\Colormap.png")
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     colors = []
     for row in reversed(image_rgb):

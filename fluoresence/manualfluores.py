@@ -157,6 +157,7 @@ def move_box(event):
 def print_coords(event):
     global square, canvas, file_path, box_x, box_y
     box_x, box_y = event.x, event.y
+    print(box_x, box_y)
     half_width = 52 / 2
     half_height = 47 / 2
     x0, y0 = box_x - half_width, box_y - half_height
