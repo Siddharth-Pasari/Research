@@ -5,11 +5,13 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 import cv2
 import dragrectangle
-import re
 import math
 from opdx_reader import DektakLoad
+import openpyxl
 
-print("-----------------------------------------------------------------------")
+# Initialize global variables for logging
+logged_data = []  # List to store logged features
+scatter_data = []  # List to store averaged differences for scatter plot
 
 def level(heightmap):
     # Calculate the slope on the x-axis using the lower height of the left and right columns
@@ -31,13 +33,15 @@ def level(heightmap):
         heightmap[row_index, :] -= top_row_min + row_index * y_slope
 
     return heightmap
-    
+
 def open_file():
     global file_path
+    global ftnum
+
     if not plt.fignum_exists(1):
         file_path = filedialog.askopenfilename(filetypes=[("OPDX files", "*.opdx")])
         if file_path:
-            ftnum=16
+            ftnum = 16
             is_empty = not ftnumt.get()
             if not is_empty:
                 try:
@@ -49,9 +53,9 @@ def open_file():
                 try:
                     process_file(file_path, int(startnum.get()), ftnum)
                 except:
-                    process_file(file_path,0,ftnum)
+                    process_file(file_path, 0, ftnum)
             else:
-                process_file(file_path,0,ftnum)
+                process_file(file_path, 0, ftnum)
     else:
         print("Close current plot before opening a new one!")
 
@@ -64,13 +68,12 @@ def read_opdx(file_path):
     loader = DektakLoad(file_path)
     x, y, z = loader.get_data_2D()
     metadata = loader.get_metadata()
-    return y, x, z.T, metadata # x and y swapped because of the TRANSPOSE
+    return y, x, z.T, metadata  # x and y swapped because of the TRANSPOSE
 
-def process_file(file_path,num=0,ftnum=16):
-
-    def format_coord(x,y):
+def process_file(file_path, num=0, ftnum=16):
+    def format_coord(x, y):
         # properly print some coordinates and other useful info
-        return f'{x:.2f},{y:.2f}, raw={data[math.floor(x), math.floor(y)]:0.4f}' #, uM={data_transpose[round(y), round(x)]:0.4f}'
+        return f'{x:.2f},{y:.2f}, raw={data[math.floor(x), math.floor(y)]:0.4f}'  # , uM={data_transpose[round(y), round(x)]:0.4f}'
 
     global data_x, data_y
 
@@ -81,26 +84,24 @@ def process_file(file_path,num=0,ftnum=16):
         data = level(data_raw)
 
     minimum = data_raw.min()
-    data = ((data_raw - minimum) * 1e6) # now in microns instead of meters
+    data = ((data_raw - minimum) * 1e6)  # now in microns instead of meters
     data_y, data_x = data_raw.shape
 
     x_uM = x.max()
     y_uM = y.max()
 
-    aspect_ratio = (data_y/data_x) * (y_uM/x_uM)
+    aspect_ratio = (data_y / data_x) * (y_uM / x_uM)
 
     data_transpose = data.T
 
     tdata = data
 
     if rotate_var.get() == 1:
-
         data_transpose = np.rot90(data_transpose, 2)
-
-        tdata=np.rot90(data, 2)
+        tdata = np.rot90(data, 2)
 
     # yes i only wrote this to look like the profilmonline colormap since i think it looks cool
-    image = cv2.imread(r"C:\Users\ASRCADMintern6\Documents\GitHub\Research\Profilometry_1\Profilometry Program\main program\Colormap.png")
+    image = cv2.imread(r"Profilometry_1\Profilometry Program\main program\Colormap.png")
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     colors = []
     for row in reversed(image_rgb):
@@ -109,13 +110,12 @@ def process_file(file_path,num=0,ftnum=16):
     custom_cmap = LinearSegmentedColormap.from_list('custom_colormap', colors)
 
     # Plotting the data with a custom colormap
-    plt.imshow(data_transpose, cmap=custom_cmap, aspect=aspect_ratio) # rotate
+    plt.imshow(data_transpose, cmap=custom_cmap, aspect=aspect_ratio)  # rotate
     plt.colorbar()  # Add a color bar for reference
-    #fig=plt.figure()
 
     # create custom tick values
-    x_ticks = np.linspace(0, data_x, int(x_uM / 500)) 
-    y_ticks = np.linspace(0, data_y, int(y_uM / 500)) 
+    x_ticks = np.linspace(0, data_x, int(x_uM / 500))
+    y_ticks = np.linspace(0, data_y, int(y_uM / 500))
 
     # create custom tick labels
     x_tick_labels = ['{:.0f}'.format(x * (y_uM / data_x)) for x in x_ticks]  # due to the transpose, switch x_uM and y_uM here
@@ -129,16 +129,12 @@ def process_file(file_path,num=0,ftnum=16):
     plt.xlabel('X-Distance (µM)')
     plt.ylabel('Y-Distance (µM)')
 
-    # interactivify the plot
-    # mplcursors.cursor(hover=True).connect("add", lambda sel: sel.annotation.set_text(f"Value: {data[sel.target.index]}"))
-
     # Create the draggable rectangle
     ax = plt.gca()
     x_values = np.linspace(0, data_x, data_x + 1)
     y_values = np.linspace(0, data_y, data_y + 1)
 
-    ax.format_coord=format_coord
-    
+    ax.format_coord = format_coord
 
     dr = dragrectangle.DragRectangle(ax, x_values, y_values, tdata, path, num, ftnum, str(titlet.get()))
     dr.connect()
@@ -148,28 +144,78 @@ def process_file(file_path,num=0,ftnum=16):
 
     print(f"Plotted numpy array as image with colormap and scale")
 
+def generate_scatter_plot():
+    # Access the global difference_list from DragRectangle class
+    difference_list = dragrectangle.DragRectangle.difference_list
+    
+    # Assuming ftnum is defined elsewhere and accessible
+    global ftnum
+
+    sums = [0] * ftnum
+    counts = [0] * ftnum
+
+    # Accumulate sums and counts
+    for sublist in difference_list:
+        for index in range(len(sublist)):
+            sums[index] += sublist[index]
+            counts[index] += 1
+
+    # Calculate the averages
+    y_values = [sums[i] / counts[i] if counts[i] > 0 else float('nan') for i in range(ftnum)]
+
+    # Generate x-values as a range of numbers corresponding to the length of y_values
+    x_values = np.arange(len(y_values) + 1)
+
+    # Create a new figure and axis for the scatter plot
+    fig = plt.subplots()
+
+    # Plot the scatter plot
+    fig.scatter(x_values, y_values, label='Data Points')
+
+    # Add vertical lines every integer x-value
+    for x in x_values:
+        fig.axvline(x=x, color='gray', linestyle='--', linewidth=0.5)
+
+    # Fit a trend line to the data
+    if len(x_values) > 1:
+        coefficients = np.polyfit(x_values, y_values, 1)  # Fit a linear trend line
+        trend_line = np.poly1d(coefficients)
+        fig.plot(x_values, trend_line(x_values), color='red', linestyle='-', linewidth=1, label='Trend Line')
+
+    # Label the axes and set the title
+    fig.set_xlabel('Feature Number')
+    fig.set_ylabel('Average Height')
+    fig.set_title('Scatter Plot of Logged Features')
+    
+    # Add a legend
+    fig.legend()
+
+    # Add grid lines only for horizontal lines
+    fig.yaxis.grid(True)
+
+    # Display the scatter plot
+    plt.show()
+
 root = tk.Tk()
 root.title("OPDX File Processor")
 
 startnum = tk.Entry(root)
-startnum.insert(0, "last number recorded (0)")
+startnum.insert(0, "Last number recorded (0)")
 startnum.pack()
 
-ftnumt= tk.Entry(root)
-ftnumt.insert(0, "# of features (16)")
+ftnumt = tk.Entry(root)
+ftnumt.insert(0, "Features per rep (16)")
 ftnumt.pack()
 
-titlet= tk.Entry(root)
-titlet.insert(0, "name of file (only if starting new)")
+titlet = tk.Entry(root)
+titlet.insert(0, "Name of file (if new)")
 titlet.pack()
 
 level_var = tk.IntVar()
-
 level_check = tk.Checkbutton(root, text="Levelling", variable=level_var, onvalue=1, offvalue=0)
 level_check.pack()
 
 rotate_var = tk.IntVar()
-
 rotate_check = tk.Checkbutton(root, text="Rotate 180°", variable=rotate_var, onvalue=1, offvalue=0)
 rotate_check.pack()
 
@@ -179,11 +225,14 @@ file_path_label.pack()
 btn_open1 = tk.Button(root, text="Open OPDX File", command=open_file)
 btn_open1.pack()
 
-btn_open = tk.Button(root, text="Exit Program", command=exit)
-btn_open.pack()
-
-info = tk.Label(root, text = "\n1. Open an excel file to log data to using the button\n\n2. Choose the OPDX file given to you by the DektakXT profilometer to plot\n\n3. Drag a rectangle around a feature, and then click the feature's bottom\n value as seen on the 2d graph. This will log both the top, bottom\nand net height of the feature to the provided excel sheet\n(see documentation video)\n\n4. To log an 'N/A' value to the provided excel sheet, right click the heatmap\n\n5. To delete a value set, middle click the heatmap")
+info = tk.Label(root, text="\n1. Open an excel file to log data to using the button\n\n2. Choose the OPDX file given to you by the DektakXT profilometer to plot\n\n3. Drag a rectangle around a feature, and then click the feature's bottom\n value as seen on the 2d graph. This will log both the top, bottom\nand net height of the feature to the provided excel sheet\n(see documentation video)\n\n4. To log an 'N/A' value to the provided excel sheet, right-click the heatmap\n\n5. To delete a value set, middle-click the heatmap\n")
 info.pack()
+
+btn_generate_graph = tk.Button(root, text="Generate Graph", command=generate_scatter_plot)
+btn_generate_graph.pack()
+
+btn_exit = tk.Button(root, text="Exit Program", command=exit)
+btn_exit.pack()
 
 # Start the Tkinter event loop
 root.mainloop()
