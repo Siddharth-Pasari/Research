@@ -164,34 +164,34 @@ def generate_scatter_plot():
     y_values = [sums[i] / counts[i] if counts[i] > 0 else float('nan') for i in range(ftnum)]
 
     # Generate x-values as a range of numbers corresponding to the length of y_values
-    x_values = np.arange(len(y_values) + 1)
+    x_values = np.arange(len(y_values))
 
     # Create a new figure and axis for the scatter plot
-    fig = plt.subplots()
+    fig, axs = plt.subplots()
 
     # Plot the scatter plot
-    fig.scatter(x_values, y_values, label='Data Points')
+    axs.scatter(x_values, y_values, label='Data Points')
 
     # Add vertical lines every integer x-value
     for x in x_values:
-        fig.axvline(x=x, color='gray', linestyle='--', linewidth=0.5)
+        axs.axvline(x=x, color='gray', linestyle='--', linewidth=0.5)
 
     # Fit a trend line to the data
     if len(x_values) > 1:
         coefficients = np.polyfit(x_values, y_values, 1)  # Fit a linear trend line
         trend_line = np.poly1d(coefficients)
-        fig.plot(x_values, trend_line(x_values), color='red', linestyle='-', linewidth=1, label='Trend Line')
+        axs.plot(x_values, trend_line(x_values), color='red', linestyle='-', linewidth=1, label='Trend Line')
 
     # Label the axes and set the title
-    fig.set_xlabel('Feature Number')
-    fig.set_ylabel('Average Height')
-    fig.set_title('Scatter Plot of Logged Features')
+    axs.set_xlabel('Feature Number')
+    axs.set_ylabel('Average Height')
+    axs.set_title('Scatter Plot of Logged Features')
     
     # Add a legend
-    fig.legend()
+    axs.legend()
 
     # Add grid lines only for horizontal lines
-    fig.yaxis.grid(True)
+    axs.yaxis.grid(True)
 
     # Display the scatter plot
     plt.show()
