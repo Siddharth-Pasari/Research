@@ -26,16 +26,12 @@ options = [section[1] for section in sections]
 dropdown_menu = tk.OptionMenu(root, tk.StringVar(root, value=options[0]), *options, command=update_selected_value)
 dropdown_menu.pack()
 
-ftnum = 16
-
 def get_section_differences():
-
     difference_list = [[]]
     val = selected_value[0][0]
 
-    data_nl[3].extend([np.nan, np.nan, "Difference"]) # Make the last section end like the other ones
+    while data_nl[3][val] != "Difference" and val + 1 < len(data_nl[3]): # This would indicate the section ended
 
-    while data_nl[3][val] != "Difference": # This would indicate the section ended
         if pd.isna(data_nl[3][val]):
             difference_list.append([])
         else:
@@ -46,6 +42,8 @@ def get_section_differences():
     return difference_list[:-2] # Remove the two blank entries
 
 def generate_scatter_plot(difference_list):
+    ftnum = len(difference_list[0]) # This is the number of features per repetition
+
     sums = [0] * ftnum
     counts = [0] * ftnum
 
