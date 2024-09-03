@@ -7,7 +7,6 @@ import cv2
 import dragrectangle
 import math
 from opdx_reader import DektakLoad
-import openpyxl
 
 # Initialize global variables for logging
 logged_data = []  # List to store logged features
