@@ -13,7 +13,7 @@ title = ""
 ftnum=16
 
 def update_excel_with_data(data_measurements, file_path, num):
-    print(data_measurements, num)
+    #print(data_measurements, num)
 
     # Create a DataFrame with specified column names
     df = pd.DataFrame(data_measurements, columns=['Num', 'Area', 'Mean', 'StdDev', 'Min', 'Max'])
@@ -148,6 +148,8 @@ def print_coords1(event):
     datalist=[]
 
     for ftnumber in range(1, 4*ftnum+1):
+
+        print(box_x, box_y)
         
         maxmean=0
         maxboxx=None
@@ -163,10 +165,8 @@ def print_coords1(event):
 
         area, mean, std_dev, min_val, max_val = analyze_square(grayscale_image, maxboxx, maxboxy)
 
-        data_measurements = (ftnumber, area, mean, std_dev, min_val, max_val)
+        data_measurements = [(ftnumber, area, mean, std_dev, min_val, max_val)]
 
-        print(data_measurements)
-        
         update_excel_with_data(data_measurements, excel_path, ftnumber)
 
         datalist.append(data_measurements)
@@ -174,19 +174,19 @@ def print_coords1(event):
         
         if ftnumber==32:
             box_y=boxyorigin
-            box_x=box_x+200
+            box_x=box_x+185
         
         elif ftnumber%ftnum==0:
-            box_x=box_x-435
-            box_y+=175
+            box_x=box_x-375
+            box_y+=145
 
         elif ftnumber%4==0:
-            box_x = box_x - 435
-            box_y = box_y + 110
+            box_x = box_x - 375
+            box_y = box_y + 89
         else:
-            box_x=box_x+145
+            box_x=box_x+125
 
-    print(datalist)
+    #print(datalist)
 
 def move_box(event):
     global box_x, box_y, square
