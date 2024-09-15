@@ -35,9 +35,13 @@ def get_section_differences():
         if pd.isna(data_nl[3][val]):
             difference_list.append([])
         else:
-            difference_list[-1].append(data_nl[3][val])
+            if (data_nl[3][val] == 'No Value'):
+                difference_list[-1].append(0)
+            else: difference_list[-1].append(data_nl[3][val])
 
         val += 1
+
+    print(difference_list)
 
     return difference_list[:-2] # Remove the two blank entries
 
