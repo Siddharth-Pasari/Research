@@ -156,7 +156,7 @@ class DragRectangle:
     def on_right_click(self, event):
         global number
         number += 1
-        data_measurements = [(number, "No Value", "No Value", "No Value")]
+        data_measurements = [(number, "NoVal", "NoVal", "NoVal")]
 
         update_excel_with_data(data_measurements, self.path, number)
 
