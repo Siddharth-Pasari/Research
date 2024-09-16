@@ -37,6 +37,8 @@ def open_file():
     global file_path
     global ftnum
 
+    dragrectangle.DragRectangle.difference_list = [[]]
+
     if not plt.fignum_exists(1):
         file_path = filedialog.askopenfilename(filetypes=[("OPDX files", "*.opdx")])
         if file_path:

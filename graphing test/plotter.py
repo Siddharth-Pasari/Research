@@ -83,8 +83,10 @@ def add_graph_to_excel(difference_list):
     worksheet = workbook.create_sheet(graph_sheet_name)
 
     ftnum = len(difference_list[0])
+
     sums = [0] * ftnum
     counts = [0] * ftnum
+
     for sublist in difference_list:
         for index in range(len(sublist)):
             sums[index] += sublist[index]
