@@ -117,6 +117,17 @@ def display_image(file_path):
     canvas.create_image(0, 0, anchor='nw', image=tk_img)  # Display the image on the canvas
     canvas.config(scrollregion=canvas.bbox(tk.ALL))  # Update the scroll region to encompass the image
 
+def nafunc(event):
+    global num
+   
+    num += 1
+
+    # List of data points (area, mean, std_dev, min_val, max_val)
+    data_measurements = [(num,  "NoVal",  "NoVal",  "NoVal",  "NoVal",  "NoVal")]
+
+    update_excel_with_data(data_measurements, excel_path, num)
+
+
 def print_coords1(event):
     global num
     # Open the image
@@ -200,6 +211,8 @@ btn_open = tk.Button(window, text="Exit Program", command=exit)
 btn_open.pack()
 
 canvas.bind("<Button-1>", print_coords)  # Bind the button click to the canvas, not a label
+
+canvas.bind("<Button-2>", nafunc)  # Bind the button click to the canvas, not a label
 
 canvas.bind("<Button-3>", print_coords1)  # Bind the button click to the canvas, not a label
 
