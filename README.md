@@ -14,41 +14,55 @@ The Profilometry package also includes a subpackage of its own, the grapher, whi
 
 ```
 .
-|   .gitattributes
-|   .gitignore
-|   pyproject.toml
-|   README.md
-|   requirements-dev.txt
-|   requirements.txt
-|   setup.cfg
-|   setup.py
-|   structure.txt
-|           
-├── fluorescence
-|   |   autofluorescence.py
-|   |   fluorescence.py
-|   |   utils.py
-|   |   __init__.py
-|           
-├── profilometry
-|   |   colormap.png
-|   |   dragrectangle.py
-|   |   opdx_plotter.py
-|   |   opdx_reader.py
-|   |   __init__.py
-|   |   
-|   ├── grapher
-|   |   |   plotter.py
-|   |   |   __init__.py                   
+├── braunschweig_lab_research
+│   ├── fluorescence
+│   │   ├── __init__.py
+│   │   ├── autofluorescence.py
+│   │   ├── fluorescence.py
+│   ├── profilometry
+│   │   ├── __init__.py
+│   │   ├── dragrectangle.py
+│   │   ├── opdx_plotter.py
+│   │   ├── opdx_reader.py
+│   │   ├── colormap.png
+│   │   ├── grapher
+│   │   │   ├── __init__.py
+│   │   │   ├── plotter.py
+├── README.md
+├── requirements.txt
+├── requirements-dev.txt
+├── pyproject.toml
+├── setup.cfg
+├── setup.py
+├── .gitignore
+└── .github
+    └── workflows
+        └── python-ci.yml             
 ```
 
 ## **`Setup Instructions`**
 
-### 1. Install the Package via PyPI
+### 1. Install the Package
+
+**`Option 1: Install via PyPI`**
 
 Ensure you have Python installed, then run:
 
     pip install braunschweig-lab-research
+
+**`Option 2: Clone the Repository`**
+
+To install the package from the source, first clone the repository:
+
+    git clone https://github.com/Siddharth-Pasari/Research.git
+    cd Research
+
+Then, create a virtual environment and install dependencies:
+
+    python -m venv venv
+    source venv/bin/activate  # On macOS/Linux
+    venv\Scripts\activate     # On Windows
+    pip install -e .
 
 ### 2. Running Fluorescence Code
 
