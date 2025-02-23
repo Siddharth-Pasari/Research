@@ -9,7 +9,6 @@ import pandas as pd
 import openpyxl
 from openpyxl.styles import Font
 
-
 title = "TITLE"
 
 def update_difference_list(data_measurements):
@@ -19,6 +18,7 @@ def update_difference_list(data_measurements):
         difference_list.append([])
         
     difference_list[-1].append(data_measurements[0][3])
+
 
 def update_excel_with_data(data_measurements, file_path, num):
     print(data_measurements, num)
@@ -44,6 +44,7 @@ def update_excel_with_data(data_measurements, file_path, num):
             headers = False
         
         df.to_excel(writer, sheet_name='Sheet1', startrow=startrow, index=False, header=headers)
+
 
 def plot_2d_slice(height_values, max_val, excel_path):
     x_values = np.arange(len(height_values))
@@ -232,3 +233,4 @@ class DragRectangle:
             return np.nan, np.nan
         
         plot_2d_slice(max_list, max_value, self.path)   
+        

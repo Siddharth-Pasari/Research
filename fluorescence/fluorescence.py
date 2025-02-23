@@ -44,6 +44,7 @@ def update_excel_with_data(data_measurements, file_path, num):
         # Write the DataFrame to the sheet at the updated starting row
         df.to_excel(writer, sheet_name='Sheet1', startrow=startrow, index=False, header=headers)
 
+
 def convert_to_grayscale(image):
     # Ensure image is in RGB mode
     if image.mode != 'RGB':
@@ -57,6 +58,7 @@ def convert_to_grayscale(image):
             pixels[x, y] = (gray, gray, gray)
 
     return image.convert('L')
+
 
 def analyze_square(image, x, y):
     # Define the size of the rectangle region
@@ -83,6 +85,7 @@ def analyze_square(image, x, y):
 
     return area, mean, std_dev, min_val, max_val
 
+
 def get_file_path():
     global file_path, ftnum, num, title
     file_path = filedialog.askopenfilename(initialdir="/", title="Select file",
@@ -107,10 +110,12 @@ def get_file_path():
 
         display_image(file_path)
 
+
 def get_file_path2():
     global excel_path
     excel_path = filedialog.askopenfilename(initialdir="/", title="Select file",
                                             filetypes=(("Excel files", "*.xlsx"), ("all files", "*.*")))
+
 
 def display_image(file_path):
     global img, tk_img, canvas  # Declare as global to access outside of the function
@@ -118,6 +123,7 @@ def display_image(file_path):
     tk_img = ImageTk.PhotoImage(img)
     canvas.create_image(0, 0, anchor='nw', image=tk_img)  # Display the image on the canvas
     canvas.config(scrollregion=canvas.bbox(tk.ALL))  # Update the scroll region to encompass the image
+
 
 def nafunc(event):
     global num
@@ -148,6 +154,7 @@ def print_coords1(event):
 
     update_excel_with_data(data_measurements, excel_path, num)
 
+
 def move_box(event):
     global box_x, box_y, square
     if event.keysym == 'Left':
@@ -167,6 +174,7 @@ def move_box(event):
     except:
         pass
 
+
 def print_coords(event):
     global square, canvas, file_path, box_x, box_y
     box_x, box_y = event.x, event.y
@@ -179,51 +187,52 @@ def print_coords(event):
         canvas.delete(square)  # Delete previous square
     square = canvas.create_rectangle(x0, y0, x1, y1, outline='#FFFF00', fill='')  # Draw new square
 
-root = tk.Tk()
-root.title('Image Viewer')
 
-canvas = tk.Canvas(root, width=3840, height=2060)  # You might want to adjust the size to fit your image properly
-canvas.pack()
+if __name__ == "__main__":
+    root = tk.Tk()
+    root.title('Image Viewer')
 
-window=tk.Toplevel()
-window.title('Info')
-window.geometry('300x400')
+    canvas = tk.Canvas(root, width=3840, height=2060)  # You might want to adjust the size to fit your image properly
+    canvas.pack()
 
-startnum = tk.Entry(window)
-startnum.insert(0, "last number recorded (0)")
-startnum.pack()
+    window=tk.Toplevel()
+    window.title('Info')
+    window.geometry('300x400')
 
-ftnumt= tk.Entry(window)
-ftnumt.insert(0, "# of features (16)")
-ftnumt.pack()
+    startnum = tk.Entry(window)
+    startnum.insert(0, "last number recorded (0)")
+    startnum.pack()
 
-titlet= tk.Entry(window)
-titlet.insert(0, "name of file (only if starting new)")
-titlet.pack()
+    ftnumt= tk.Entry(window)
+    ftnumt.insert(0, "# of features (16)")
+    ftnumt.pack()
 
-level_var = tk.IntVar()
+    titlet= tk.Entry(window)
+    titlet.insert(0, "name of file (only if starting new)")
+    titlet.pack()
 
-file_path_label = tk.Button(window, text="Open Excel File", command=get_file_path2)
-file_path_label.pack()
+    level_var = tk.IntVar()
 
-btn_open1 = tk.Button(window, text="Open Image  File", command=get_file_path)
-btn_open1.pack()
+    file_path_label = tk.Button(window, text="Open Excel File", command=get_file_path2)
+    file_path_label.pack()
 
-btn_open = tk.Button(window, text="Exit Program", command=exit)
-btn_open.pack()
+    btn_open1 = tk.Button(window, text="Open Image  File", command=get_file_path)
+    btn_open1.pack()
 
-canvas.bind("<Button-1>", print_coords)  # Bind the button click to the canvas, not a label
+    btn_open = tk.Button(window, text="Exit Program", command=exit)
+    btn_open.pack()
 
-canvas.bind("<Button-2>", nafunc)  # Bind the button click to the canvas, not a label
+    canvas.bind("<Button-1>", print_coords)  # Bind the button click to the canvas, not a label
 
-canvas.bind("<Button-3>", print_coords1)  # Bind the button click to the canvas, not a label
+    canvas.bind("<Button-2>", nafunc)  # Bind the button click to the canvas, not a label
 
-canvas.focus_set()  # Set focus to the canvas so it can receive key events
-canvas.bind("<Key>", move_box)  #
+    canvas.bind("<Button-3>", print_coords1)  # Bind the button click to the canvas, not a label
 
+    canvas.focus_set()  # Set focus to the canvas so it can receive key events
+    canvas.bind("<Key>", move_box)  #
 
-square = None  # Variable to hold square object
+    square = None  # Variable to hold square object
 
+    root.mainloop()
 
-
-root.mainloop()
+    print("Closing application...")

@@ -1,9 +1,12 @@
-# Python build artifacts
 *.egg-info/
 *.egg
+
+*.pyc
+*.pyo
+
 dist/
 build/
+.idea/
 
-# Virtual environments
 venv/
 .env/

@@ -10,7 +10,6 @@ import cv2
 from .opdx_reader import DektakLoad
 from .dragrectangle import DragRectangle
 
-
 # Initialize global variables for logging
 logged_data = []  # List to store logged features
 scatter_data = []  # List to store averaged differences for scatter plot
@@ -35,6 +34,7 @@ def level(heightmap):
         heightmap[row_index, :] -= top_row_min + row_index * y_slope
 
     return heightmap
+
 
 def open_file():
     global file_path
@@ -63,16 +63,19 @@ def open_file():
     else:
         print("Close current plot before opening a new one!")
 
+
 def open_file2():
     global path
     if not plt.fignum_exists(1):
         path = filedialog.askopenfilename(filetypes=[("excel files", "*.xlsx")])
+
 
 def read_opdx(file_path):
     loader = DektakLoad(file_path)
     x, y, z = loader.get_data_2D()
     metadata = loader.get_metadata()
     return y, x, z.T, metadata  # x and y swapped because of the TRANSPOSE
+
 
 def process_file(file_path, num=0, ftnum=16):
     def format_coord(x, y):
@@ -148,6 +151,7 @@ def process_file(file_path, num=0, ftnum=16):
 
     print(f"Plotted numpy array as image with colormap and scale")
 
+
 def generate_scatter_plot():
     # Access the global difference_list from DragRectangle class
     difference_list = DragRectangle.difference_list
@@ -200,45 +204,47 @@ def generate_scatter_plot():
     # Display the scatter plot
     plt.show()
 
-root = tk.Tk()
-root.title("OPDX File Processor")
 
-startnum = tk.Entry(root)
-startnum.insert(0, "Last number recorded (0)")
-startnum.pack()
+if __name__ == "__main__":
+    root = tk.Tk()
+    root.title("OPDX File Processor")
 
-ftnumt = tk.Entry(root)
-ftnumt.insert(0, "Features per rep (16)")
-ftnumt.pack()
+    startnum = tk.Entry(root)
+    startnum.insert(0, "Last number recorded (0)")
+    startnum.pack()
 
-titlet = tk.Entry(root)
-titlet.insert(0, "Name of file (if new)")
-titlet.pack()
+    ftnumt = tk.Entry(root)
+    ftnumt.insert(0, "Features per rep (16)")
+    ftnumt.pack()
 
-level_var = tk.IntVar()
-level_check = tk.Checkbutton(root, text="Levelling", variable=level_var, onvalue=1, offvalue=0)
-level_check.pack()
+    titlet = tk.Entry(root)
+    titlet.insert(0, "Name of file (if new)")
+    titlet.pack()
 
-rotate_var = tk.IntVar()
-rotate_check = tk.Checkbutton(root, text="Rotate 180°", variable=rotate_var, onvalue=1, offvalue=0)
-rotate_check.pack()
+    level_var = tk.IntVar()
+    level_check = tk.Checkbutton(root, text="Levelling", variable=level_var, onvalue=1, offvalue=0)
+    level_check.pack()
 
-file_path_label = tk.Button(root, text="Open Excel File", command=open_file2)
-file_path_label.pack()
+    rotate_var = tk.IntVar()
+    rotate_check = tk.Checkbutton(root, text="Rotate 180°", variable=rotate_var, onvalue=1, offvalue=0)
+    rotate_check.pack()
 
-btn_open1 = tk.Button(root, text="Open OPDX File", command=open_file)
-btn_open1.pack()
+    file_path_label = tk.Button(root, text="Open Excel File", command=open_file2)
+    file_path_label.pack()
 
-info = tk.Label(root, text="\n1. Open an excel file to log data to using the button\n\n2. Choose the OPDX file given to you by the DektakXT profilometer to plot\n\n3. Drag a rectangle around a feature, and then click the feature's bottom\n value as seen on the 2d graph. This will log both the top, bottom\nand net height of the feature to the provided excel sheet\n(see documentation video)\n\n4. To log an 'N/A' value to the provided excel sheet, right-click the heatmap\n\n5. To delete a value set, middle-click the heatmap\n")
-info.pack()
+    btn_open1 = tk.Button(root, text="Open OPDX File", command=open_file)
+    btn_open1.pack()
 
-btn_generate_graph = tk.Button(root, text="Generate Graph", command=generate_scatter_plot)
-btn_generate_graph.pack()
+    info = tk.Label(root, text="\n1. Open an excel file to log data to using the button\n\n2. Choose the OPDX file given to you by the DektakXT profilometer to plot\n\n3. Drag a rectangle around a feature, and then click the feature's bottom\n value as seen on the 2d graph. This will log both the top, bottom\nand net height of the feature to the provided excel sheet\n(see documentation video)\n\n4. To log an 'N/A' value to the provided excel sheet, right-click the heatmap\n\n5. To delete a value set, middle-click the heatmap\n")
+    info.pack()
 
-btn_exit = tk.Button(root, text="Exit Program", command=exit)
-btn_exit.pack()
+    btn_generate_graph = tk.Button(root, text="Generate Graph", command=generate_scatter_plot)
+    btn_generate_graph.pack()
 
-# Start the Tkinter event loop
-root.mainloop()
+    btn_exit = tk.Button(root, text="Exit Program", command=exit)
+    btn_exit.pack()
 
-print("Closing application...")
+    # Start the Tkinter event loop
+    root.mainloop()
+
+    print("Closing application...")
