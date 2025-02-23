@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "braunschweig_lab_research"
+version = "1.0.0"
+description = "A package for fluorescence and profilometry data analysis developed by high school students at the Braunschweig Group Laboratory at the CUNY ASRC"
+authors = [{name = "Anthony Russo", email = "anthonyrusso@hunterschools.org"}, {name = "Siddharth Pasari", email = "siddharthpasari@hunterschools.org"}]
+dependencies = [
+    "matplotlib>=3.10.0",
+    "numpy>=2.0,<3.0",
+    "pandas>=2.2.3",
+    "pillow>=11.1.0",
+    "openpyxl>=3.1.5",
+    "scipy>=1.15.2",
+    "opencv-python>=4.11.0.86"
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "black", "mypy", "flake8"]
+
+[tool.setuptools]
+packages = ["fluorescence", "profilometry", "profilometry.grapher"]
+
+[project.scripts]
+fluorescence-cli = "fluorescence.fluorescence:main"
+profilometry-cli = "profilometry.opdx_plotter:main"
