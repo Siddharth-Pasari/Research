@@ -1,3 +1,0 @@
-[console_scripts]
-fluorescence-cli = fluorescence.fluorescence:main
-profilometry-cli = profilometry.opdx_plotter:main

@@ -1,5 +1,9 @@
-__pycache__/
+# Python build artifacts
+*.egg-info/
+*.egg
+dist/
+build/
+
+# Virtual environments
 venv/
-*.pyc
-*.pyo
-.DS_Store
+.env/
