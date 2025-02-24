@@ -21,7 +21,7 @@ def update_difference_list(data_measurements):
 
 
 def update_excel_with_data(data_measurements, file_path, num):
-    print(data_measurements, num)
+    print(f"Logged row {num}: {data_measurements}")
 
     df = pd.DataFrame(data_measurements, columns=['Num', 'Top', 'Bottom', 'Difference'])
 
@@ -133,6 +133,7 @@ class DragRectangle:
         self.cidpress = self.ax.figure.canvas.mpl_connect('button_press_event', self.on_press)
         self.cidrelease = self.ax.figure.canvas.mpl_connect('button_release_event', self.on_release)
         self.cidmotion = self.ax.figure.canvas.mpl_connect('motion_notify_event', self.on_motion)
+        self.cidkey = self.ax.figure.canvas.mpl_connect('key_press_event', self.on_key_press)
 
     def update_difference_list(self, data_measurements):
         if len(self.difference_list[-1]) >= ftnumber:
@@ -143,14 +144,19 @@ class DragRectangle:
         if event.inaxes != self.ax:
             return
 
-        if event.button == 3:  # Right-click event
-            self.on_right_click(event)
+        if event.button == 1:
+            self.on_left_click(event)
             return
         
-        if event.button == 2:  # Middle-click event
-            self.on_middle_click(event)
+        if event.button == 3:
+            self.on_right_click(event)
             return
 
+    def on_key_press(self, event):
+        if event.key == "backspace":
+            self.on_backspace(event)
+
+    def on_left_click(self, event):
         self.press_event = event
         self.rect.set_width(0)
         self.rect.set_height(0)
@@ -165,21 +171,25 @@ class DragRectangle:
 
         update_excel_with_data(data_measurements, self.path, number)
 
-    def on_middle_click(self, event):
+    def on_backspace(self, event):
         global number
-        number -= 1
-        file_path = self.path
-        workbook = openpyxl.load_workbook(file_path)
-        sheet = workbook.active
 
-        df = pd.read_excel(file_path)
-        last_row_index = df.last_valid_index()
+        if number >= 1:
+            number -= 1
+            file_path = self.path
+            workbook = openpyxl.load_workbook(file_path)
+            sheet = workbook.active
 
-        if last_row_index is not None:
-            sheet.delete_rows(last_row_index + 2)
+            df = pd.read_excel(file_path)
+            last_row_index = df.last_valid_index()
 
-        print("deleted")
-        workbook.save(file_path)
+            if last_row_index is not None:
+                sheet.delete_rows(last_row_index + 2)
+
+            print(f"Deleted row {number + 1}")
+            workbook.save(file_path)
+        else:
+            print(f"No rows left to delete")
 
     def on_motion(self, event):
         if not self.is_dragging or event.inaxes != self.ax:

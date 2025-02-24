@@ -1,8 +1,10 @@
 *.egg-info/
 *.egg
 
+__pycache__/
 *.pyc
 *.pyo
+*.pyd
 
 dist/
 build/

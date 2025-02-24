@@ -39,12 +39,15 @@ def level(heightmap):
 def open_file():
     global file_path
     global ftnum
+    global startnum
 
     DragRectangle.difference_list = [[]]
 
     if not plt.fignum_exists(1):
         file_path = filedialog.askopenfilename(filetypes=[("OPDX files", "*.opdx")])
+
         if file_path:
+
             ftnum = 16
             is_empty = not ftnumt.get()
             if not is_empty:
@@ -52,14 +55,16 @@ def open_file():
                     ftnum = int(ftnumt.get())
                 except:
                     pass
-            is_empty = not startnum.get()
+
+            startnum = 0
+            is_empty = not startnumt.get()
             if not is_empty:
                 try:
-                    process_file(file_path, int(startnum.get()), ftnum)
+                    startnum = int(startnumt.get())
                 except:
-                    process_file(file_path, 0, ftnum)
-            else:
-                process_file(file_path, 0, ftnum)
+                    pass
+
+            process_file(file_path, startnum, ftnum)
     else:
         print("Close current plot before opening a new one!")
 
@@ -152,66 +157,13 @@ def process_file(file_path, num=0, ftnum=16):
     print(f"Plotted numpy array as image with colormap and scale")
 
 
-def generate_scatter_plot():
-    # Access the global difference_list from DragRectangle class
-    difference_list = DragRectangle.difference_list
-    
-    # Assuming ftnum is defined elsewhere and accessible
-    global ftnum
-
-    sums = [0] * ftnum
-    counts = [0] * ftnum
-
-    # Accumulate sums and counts
-    for sublist in difference_list:
-        for index in range(len(sublist)):
-            sums[index] += sublist[index]
-            counts[index] += 1
-
-    # Calculate the averages
-    y_values = [sums[i] / counts[i] if counts[i] > 0 else float('nan') for i in range(ftnum)]
-
-    # Generate x-values as a range of numbers corresponding to the length of y_values
-    x_values = np.arange(len(y_values))
-
-    # Create a new figure and axis for the scatter plot
-    fig, axs = plt.subplots()
-
-    # Plot the scatter plot
-    axs.scatter(x_values, y_values, label='Data Points')
-
-    # Add vertical lines every integer x-value
-    for x in x_values:
-        axs.axvline(x=x, color='gray', linestyle='--', linewidth=0.5)
-
-    # Fit a trend line to the data
-    if len(x_values) > 1:
-        coefficients = np.polyfit(x_values, y_values, 1)  # Fit a linear trend line
-        trend_line = np.poly1d(coefficients)
-        axs.plot(x_values, trend_line(x_values), color='red', linestyle='-', linewidth=1, label='Trend Line')
-
-    # Label the axes and set the title
-    axs.set_xlabel('Feature Number')
-    axs.set_ylabel('Average Height')
-    axs.set_title('Scatter Plot of Logged Features')
-    
-    # Add a legend
-    axs.legend()
-
-    # Add grid lines only for horizontal lines
-    axs.yaxis.grid(True)
-
-    # Display the scatter plot
-    plt.show()
-
-
 if __name__ == "__main__":
     root = tk.Tk()
     root.title("OPDX File Processor")
 
-    startnum = tk.Entry(root)
-    startnum.insert(0, "Last number recorded (0)")
-    startnum.pack()
+    startnumt = tk.Entry(root)
+    startnumt.insert(0, "Last recorded (0)")
+    startnumt.pack()
 
     ftnumt = tk.Entry(root)
     ftnumt.insert(0, "Features per rep (16)")
@@ -235,11 +187,8 @@ if __name__ == "__main__":
     btn_open1 = tk.Button(root, text="Open OPDX File", command=open_file)
     btn_open1.pack()
 
-    info = tk.Label(root, text="\n1. Open an excel file to log data to using the button\n\n2. Choose the OPDX file given to you by the DektakXT profilometer to plot\n\n3. Drag a rectangle around a feature, and then click the feature's bottom\n value as seen on the 2d graph. This will log both the top, bottom\nand net height of the feature to the provided excel sheet\n(see documentation video)\n\n4. To log an 'N/A' value to the provided excel sheet, right-click the heatmap\n\n5. To delete a value set, middle-click the heatmap\n")
+    info = tk.Label(root, text="\n1. Choose the excel file to log data to\n\n2. Choose the OPDX file given to you by the DektakXT profilometer to plot\n\n3. Drag a rectangle around a feature, and then click the feature's bottom\n value as seen on the 2d graph. This will log both the top, bottom\nand net height of the feature to the provided excel sheet\n\n4. To log an 'NoVal' value to the provided excel sheet, right-click the heatmap\n\n5. To delete a value set, backspace the heatmap\n")
     info.pack()
-
-    btn_generate_graph = tk.Button(root, text="Generate Graph", command=generate_scatter_plot)
-    btn_generate_graph.pack()
 
     btn_exit = tk.Button(root, text="Exit Program", command=exit)
     btn_exit.pack()
