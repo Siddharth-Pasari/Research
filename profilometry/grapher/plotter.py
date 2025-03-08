@@ -111,7 +111,7 @@ def add_graph_to_excel(path, difference_list, selected_value):
     workbook.save(path)
 
 
-if __name__ == "__main__":
+def main():
     root = tk.Tk()
     root.withdraw()
     
@@ -131,3 +131,7 @@ if __name__ == "__main__":
     tk.Button(root, text="Add Graph to Excel", command=lambda: add_graph_to_excel(path, get_section_differences(data_nl, selected_value), selected_value)).pack()
     
     root.mainloop()
+
+
+if __name__ == "__main__":
+    main()

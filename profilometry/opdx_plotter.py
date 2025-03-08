@@ -157,7 +157,7 @@ def process_file(file_path, num=0, ftnum=16):
     print(f"Plotted numpy array as image with colormap and scale")
 
 
-if __name__ == "__main__":
+def main():
     root = tk.Tk()
     root.title("OPDX File Processor")
 
@@ -197,3 +197,7 @@ if __name__ == "__main__":
     root.mainloop()
 
     print("Closing application...")
+
+
+if __name__ == "__main__":
+    main()

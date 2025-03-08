@@ -188,7 +188,7 @@ def print_coords(event):
     square = canvas.create_rectangle(x0, y0, x1, y1, outline='#FFFF00', fill='')  # Draw new square
 
 
-if __name__ == "__main__":
+def main():
     root = tk.Tk()
     root.title('Image Viewer')
 
@@ -236,3 +236,7 @@ if __name__ == "__main__":
     root.mainloop()
 
     print("Closing application...")
+
+
+if __name__ == "__main__":
+    main()
