@@ -189,6 +189,11 @@ def print_coords(event):
 
 
 def main():
+    global startnum
+    global ftnumt
+    global titlet
+    global level_var
+
     root = tk.Tk()
     root.title('Image Viewer')
 

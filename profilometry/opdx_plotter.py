@@ -158,6 +158,12 @@ def process_file(file_path, num=0, ftnum=16):
 
 
 def main():
+    global startnumt
+    global ftnumt
+    global titlet
+    global level_var
+    global rotate_var
+
     root = tk.Tk()
     root.title("OPDX File Processor")
 
