@@ -10,6 +10,21 @@ Profilometry analysis isbased off of a .OPDx file (from the DektakXT stylus prof
 
 The Profilometry package also includes a subpackage of its own, the grapher, which uses the Excel output as an input and users can choose to select files to generate graphs (in the form of Excel sheets in the same file) of height vs. feature number.
 
+## **`How To Use`**
+
+Profilometry:
+- Click and drag to form a rectangle around a region
+- The highest point of the region is automatically chosen
+- Click the point on the 2D representation where you would like to log the lowest point
+- Right click the heatmap to create a 'NoVal' row
+- Backspace the heatmap to delete the last row (close 2D graph if open)
+- Keep track of rows via the terminal if you'd like (close 2D graph if open)
+- To go to a new file, close the current running heatmap
+
+Fluorescence:
+- Click where you want to center the rectangle
+- Right click to log the currently surrounded area
+
 ## **`Directory Structure`**
 
 ```
