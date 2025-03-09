@@ -46,9 +46,7 @@ The Profilometry package also includes a subpackage of its own, the grapher, whi
 
 **`Option 1: Install via PyPI`**
 
-Ensure you have Python installed, then run:
-
-    pip install braunschweig-lab-research
+PyPI support not implemented yet.
 
 **`Option 2: Clone the Repository`**
 
