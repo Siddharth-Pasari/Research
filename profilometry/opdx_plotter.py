@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog
 import math
+import os
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -113,12 +114,17 @@ def process_file(file_path, num=0, ftnum=16):
         tdata = np.rot90(data, 2)
 
     # yes i only wrote this to look like the profilmonline colormap since i think it looks cool
-    image = cv2.imread("profilometry\colormap.png")
-    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    dirname = os.path.dirname(os.path.abspath(__file__))
+    image = os.path.join(dirname, 'colormap.png')
+
+    image_bgr = cv2.imread(image)
+    image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
+    
     colors = []
     for row in reversed(image_rgb):
         for color in row:
             colors.append(color / 255.0)  # Normalize the colors to range [0, 1]
+
     custom_cmap = LinearSegmentedColormap.from_list('custom_colormap', colors)
 
     # Plotting the data with a custom colormap
