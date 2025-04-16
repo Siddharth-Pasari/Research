@@ -25,36 +25,6 @@ Fluorescence:
 - Click where you want to center the rectangle
 - Right click to log the currently surrounded area
 
-## **`Directory Structure`**
-
-```
-.
-├── braunschweig_lab_research
-│   ├── fluorescence
-│   │   ├── __init__.py
-│   │   ├── autofluorescence.py
-│   │   ├── fluorescence.py
-│   ├── profilometry
-│   │   ├── __init__.py
-│   │   ├── dragrectangle.py
-│   │   ├── opdx_plotter.py
-│   │   ├── opdx_reader.py
-│   │   ├── colormap.png
-│   │   ├── grapher
-│   │   │   ├── __init__.py
-│   │   │   ├── plotter.py
-├── README.md
-├── requirements.txt
-├── requirements-dev.txt
-├── pyproject.toml
-├── setup.cfg
-├── setup.py
-├── .gitignore
-└── .github
-    └── workflows
-        └── python-ci.yml             
-```
-
 ## **`Setup Instructions`**
 
 ### 1. Install the Package

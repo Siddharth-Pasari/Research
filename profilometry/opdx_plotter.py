@@ -2,14 +2,15 @@ import tkinter as tk
 from tkinter import filedialog
 import math
 import os
+import sys
 
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 import cv2
 
-from .opdx_reader import DektakLoad
-from .dragrectangle import DragRectangle
+from profilometry.opdx_reader import DektakLoad
+from profilometry.dragrectangle import DragRectangle
 
 # Initialize global variables for logging
 logged_data = []  # List to store logged features
@@ -202,7 +203,7 @@ def main():
     info = tk.Label(root, text="\n1. Choose the excel file to log data to\n\n2. Choose the OPDX file given to you by the DektakXT profilometer to plot\n\n3. Drag a rectangle around a feature, and then click the feature's bottom\n value as seen on the 2d graph. This will log both the top, bottom\nand net height of the feature to the provided excel sheet\n\n4. To log an 'NoVal' value to the provided excel sheet, right-click the heatmap\n\n5. To delete a value set, backspace the heatmap\n")
     info.pack()
 
-    btn_exit = tk.Button(root, text="Exit Program", command=exit)
+    btn_exit = tk.Button(root, text="Exit Program", command=sys.exit)
     btn_exit.pack()
 
     # Start the Tkinter event loop

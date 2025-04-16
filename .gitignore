@@ -5,10 +5,12 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+*.pyz
 
 dist/
 build/
 .idea/
 
 venv/
+.venv/
 .env/

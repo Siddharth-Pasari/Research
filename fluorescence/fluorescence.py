@@ -1,10 +1,10 @@
 import tkinter as tk
 from tkinter import filedialog
 
+import sys
 import numpy as np
 import pandas as pd
 from PIL import Image, ImageTk
-import openpyxl
 from openpyxl.styles import Font
 
 num = 0
@@ -224,7 +224,7 @@ def main():
     btn_open1 = tk.Button(window, text="Open Image  File", command=get_file_path)
     btn_open1.pack()
 
-    btn_open = tk.Button(window, text="Exit Program", command=exit)
+    btn_open = tk.Button(window, text="Exit Program", command=sys.exit)
     btn_open.pack()
 
     canvas.bind("<Button-1>", print_coords)  # Bind the button click to the canvas, not a label
