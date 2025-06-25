@@ -47,7 +47,7 @@ Then, create a virtual environment and install dependencies:
     venv\Scripts\activate     # On Windows
     pip install -e .
 
-### 2. Running Fluorescence Code
+### 2. Running Fluorescence Code (make sure you are still in venv)
 
 To run the fluorescence module, use:
 
@@ -57,7 +57,7 @@ Or run it manually:
 
     python -m braunschweig_lab_research.fluorescence.fluorescence
 
-### 3. Running Profilometry Code
+### 3. Running Profilometry Code (make sure you are still in venv)
 
 To run the profilometry module, use:
 
@@ -66,3 +66,10 @@ To run the profilometry module, use:
 Or run it manually:
 
     python -m braunschweig_lab_research.profilometry.opdx_plotter
+
+## **Updating the Package**
+
+    If you've already cloned the repository and installed the package using `pip install -e .`, you can update it easily by pulling the latest changes:
+
+    cd path/to/Research
+    git pull origin main
