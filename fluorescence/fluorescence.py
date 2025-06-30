@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter import filedialog
 
 import sys
-import os
 import numpy as np
 import pandas as pd
 from PIL import Image, ImageTk
